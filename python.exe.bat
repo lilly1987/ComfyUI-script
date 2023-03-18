@@ -1,0 +1,1 @@
+.\ComfyUI_windows_portable\python_embeded\python.exe %1
