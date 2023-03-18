@@ -135,15 +135,19 @@ chars={
         "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
         "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"]
     },
+    "Tomoyo" : {
+        "prompt" : "tomoyo, long hair, bangs, small breasts,",
+        "lora" : ["daidoujiTomoyo_v01.safetensors"]
+    },
 
 }
 
-for i in range(1):
+for i in range(4):
 
     prompt[names["CheckpointLoaderSimple"]]["inputs"]["ckpt_name"] = os.path.basename(random.choice(ckpts))
     prompt[names["SaveImage"]]["inputs"]["filename_prefix"] = os.path.splitext(prompt[names["CheckpointLoaderSimple"]]["inputs"]["ckpt_name"])[0]
     
-    for j in range(1):
+    for j in range(4):
 
         for c  in chars:
             
@@ -156,7 +160,7 @@ for i in range(1):
                 
             if "lora" in chars[c]: 
                 
-                print("lora" , type(chars[c]["lora"]))
+                #print("lora" , type(chars[c]["lora"]))
                 if type(chars[c]["lora"]) is list :
                     #print("lora1" , random.choice(chars[c]["lora"]))
                     prompt[names["LoraLoader"]]["inputs"]["lora_name"] = random.choice(chars[c]["lora"])
