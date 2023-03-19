@@ -38,7 +38,7 @@ ckpts=glob.glob(
 
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
 
-print(f"ckpts {ckptnms}")
+#print(f"ckpts {ckptnms}")
 
 prompt_add(
     "CheckpointLoaderSimple",
@@ -89,7 +89,7 @@ prompt_add(
     "CLIPTextEncode",
     {
         "clip" : [names["CheckpointLoaderSimple"],1],
-        "text": quality+dress+NSFW
+        "text": ""
     }
 )
 
@@ -173,7 +173,7 @@ chars={
 
 }
 
-myckpts=+["AOM3A1-fp16","libmix_v20-fp16"]
+myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 
 for ckptnm in random.sample(ckptnms,100)+myckpts:
 
@@ -183,10 +183,10 @@ for ckptnm in random.sample(ckptnms,100)+myckpts:
 
     #continue
     
-    for j in range(4):
-
-        for c  in chars:
+    for c  in chars:
+        for j in range(4):
             
+            print(f"char : {c}" )
             if "prompt" in chars[c]: 
                 #print("prompt" , chars[c]["prompt"])
                 prompt[names["CLIPTextEncodeP"]]["inputs"]["text"] = quality+chars[c]["prompt"]+dress+NSFW
