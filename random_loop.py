@@ -6,9 +6,6 @@ import os, glob
 prompt={}
 names={}
 
-quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,"
-dress="{sweater|maid|princess royal|santa|lolita fashion|china|witch|wedding|{yukata|kimono}} {frilled |}{long |}dress, {{puffy | }{wide | }{long | }sleeves,| } high heels, off shoulder, bare shoulders, Strapless,"
-NSFW="NSFW, breasts exposure, breastsout, nipple exposure, "
 
 def pget(name,input):
     return prompt[names[name]]["inputs"][input]
@@ -152,15 +149,22 @@ prompt_add(
 #print(names)
 #print(prompt)
 
+quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,"
+dress="{sweater|maid|princess royal|santa|lolita fashion|china|witch|wedding|yukata|kimono|} {frilled |}{long |}dress, {{puffy | }{wide |}{long |}sleeves,|} high heels, off shoulder, bare shoulders, Strapless,"
+NSFW="NSFW, breasts exposure, breastsout, nipple exposure, "
+
 chars={ 
-    #"diana" : {
-    #    "prompt" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
-    #    "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors"
-    #},
-    #"schnee" : {
-    #    "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
-    #    "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"]
-    #},
+    "my" : {
+        "prompt" : "long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,",
+    },
+    "diana" : {
+        "prompt" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors"
+    },
+    "schnee" : {
+        "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"]
+    },
     "Tomoyo" : {
         "prompt" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
         "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
@@ -169,7 +173,9 @@ chars={
 
 }
 
-for ckptnm in random.sample(ckptnms,3)+["AOM3A1-fp16.safetensors"]:
+myckpts=+["AOM3A1-fp16","libmix_v20-fp16"]
+
+for ckptnm in random.sample(ckptnms,100)+myckpts:
 
     print(f"ckptnm : {ckptnm}")
     pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
