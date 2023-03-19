@@ -18,11 +18,11 @@ ckpts=glob.glob(
 )
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
 
-shoulder="off shoulder, bare shoulders, Strapless,"
-quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,"
-dress="{sweater|maid|princess royal|santa|lolita fashion|china|witch|wedding|yukata|kimono|} {frilled |}{long |}dress, {{puffy | }{wide |}{long |}sleeves,|} high heels, "+shoulder
-NSFW=["NSFW, breasts exposure, breastsout, nipple exposure, "]
-prompt_c="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
+shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
+quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
+dress="{__character_dress__|__dress_my__|},__acc_my__,"
+NSFW=["NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,"]
+prompt_c="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
@@ -194,7 +194,7 @@ class myprompt:
             "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.names["CheckpointLoaderSimple"],1],
-                "text": "worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome"
+                "text": "__no2d__"
             }
         )
 
@@ -275,20 +275,20 @@ class myprompt:
 
 chars={ 
     "SaegusaMayumi" : {
-        "prompt" : "mayumi,",
+        "prompt" : "{mayumi,__breasts__,|__mayumi__},",
         #"dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose,","__SaegusaMayumidress__" ,dress],
-        "dress" : "{__SaegusaMayumidress__|__character_dress__}," ,
+        "dress" : "{__SaegusaMayumidress__|__character_dress__|__dress_my__|}, __acc_my__," ,
         "lora" : ["SaegusaMayumiTheIrregularAt_mayumi"],
     },
     "Tomoyo" : {
         "prompt" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
-        "dress" : "{__character_dress__}," ,
+        #"dress" : "{__character_dress__},"+shoulder ,
         "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
     },
     "diana" : {
         "prompt" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
         "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors",
-        "dress": "{__character_dress__|__diana_cavendish_dress__},"
+        "dress":"{__diana_cavendish_dress__|__character_dress__|__dress_my__|}, __acc_my__,"
     },
     "schnee" : {
         "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
@@ -308,15 +308,17 @@ myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 wildcardsOn=False
 random.shuffle(ckptnms)
 
-for ckptnm in random.sample(ckptnms,5):#+myckpts
+for ckptnm in random.sample(ckptnms,50):#+myckpts
 #for ckptnm in ckptnms:
 
     print(f"ckptnm : {ckptnm}")
     myprompt.ckptnm=ckptnm
     #continue
     
-    c="SaegusaMayumi"
+    
     #for c  in chars:
+    c="SaegusaMayumi"
+    #for j in range(10 - len(chars)):
     for j in range(1):
         for j in range(4):
             
@@ -325,3 +327,13 @@ for ckptnm in random.sample(ckptnms,5):#+myckpts
             #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
             print(m.prompts)
             queue_prompt(m.prompts)
+    #c="SaegusaMayumi"
+    #for j in range(1):
+    #for c  in chars:
+    #    for j in range(2):
+    #        
+    #        m=myprompt()            
+    #        m.prompt_set(chars[c])
+    #        #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
+    #        print(m.prompts)
+    #        queue_prompt(m.prompts)
