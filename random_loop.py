@@ -2,7 +2,13 @@ import os, glob, sys
 import json
 from urllib import request, parse
 import random
-import wildcards
+
+wildcardsOn=False
+try:
+    import wildcards
+    wildcardsOn=True
+except:
+    wildcardsOn=False
 
 ckpts=glob.glob(
     os.path.join(
@@ -68,12 +74,33 @@ class myprompt:
             print("prompt_set error. not dict")
             return False
         tmp=""
-        tmp+=cget(c,"quality",self.quality)
-        tmp+=cget(c,"prompt",self.prompt_c)
-        tmp+=cget(c,"dress",self.dress)
-        tmp+=cget(c,"NSFW",self.NSFW)
-        self.pset("CLIPTextEncodeP","text", wildcards.run(tmp))
+        if "positive" in c:
+            tmp=c["positive"]
+        else:
+            tmp+=cget(c,"quality",self.quality)
+            r=[]
+            r.append(lambda c: cget(c,"prompt",self.prompt_c))
+            r.append(lambda c: cget(c,"dress",self.dress))
+            r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
+            random.shuffle(r)
+            for f in r:
+                tmp+=f(c)
+        
+        if wildcardsOn:
+            self.pset("CLIPTextEncodeP","text", wildcards.run(tmp))
+        else:
+            self.pset("CLIPTextEncodeP","text", tmp)
+        
+
+        if "negative" in c:
+            if wildcardsOn:
+                self.pset("CLIPTextEncodeN","text", wildcards.run(c["negative"]))
+            else:
+                self.pset("CLIPTextEncodeN","text", c["negative"])
             
+
+        
+        
         if "lora" in c: 
             #if "strength_model" in chars[c]: 
             #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(chars[c]["strength_model"][0],chars[c]["strength_model"][1]) 
@@ -164,7 +191,7 @@ class myprompt:
         self.padd(
             
             "CLIPTextEncodeN",
-            "CLIPTextEncode",
+            "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.names["CheckpointLoaderSimple"],1],
                 "text": "worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome"
@@ -174,7 +201,7 @@ class myprompt:
         self.padd(
             
             "CLIPTextEncodeP",
-            "CLIPTextEncode",
+            "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.names["CheckpointLoaderSimple"],1],
                 "text": ""
@@ -249,12 +276,13 @@ class myprompt:
 chars={ 
     "SaegusaMayumi" : {
         "prompt" : "mayumi,",
-        "dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose, " ,dress],
+        #"dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose,","__SaegusaMayumidress__" ,dress],
+        "dress" : "{__SaegusaMayumidress__|__character_dress__}," ,
         "lora" : ["SaegusaMayumiTheIrregularAt_mayumi"],
     },
     "Tomoyo" : {
         "prompt" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
-        "dress" : "{__character_dress__}" ,
+        "dress" : "{__character_dress__}," ,
         "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
     },
     "diana" : {
@@ -268,7 +296,8 @@ chars={
         #"dress": "{__character_dress__|__diana_cavendish_dress__},"
     },
     "my" : {
-        "prompt" : prompt_c,
+        "positive" : "__my__",
+        "negative" : "__no2d__",
         #"strength_model" : [0.5,1.0]
     },
 
@@ -276,6 +305,7 @@ chars={
 
 myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 
+wildcardsOn=False
 random.shuffle(ckptnms)
 
 for ckptnm in random.sample(ckptnms,5):#+myckpts
@@ -285,9 +315,11 @@ for ckptnm in random.sample(ckptnms,5):#+myckpts
     myprompt.ckptnm=ckptnm
     #continue
     
-    for c  in chars:
+    c="SaegusaMayumi"
+    #for c  in chars:
+    for j in range(1):
         for j in range(4):
-        
+            
             m=myprompt()            
             m.prompt_set(chars[c])
             #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
