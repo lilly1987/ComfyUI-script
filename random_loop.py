@@ -39,6 +39,10 @@ ckpts=glob.glob(
     )+"\\*-fp16.safetensors"
 )
 
+ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
+
+print(f"ckpts {ckptnms}")
+
 prompt_add(
     "CheckpointLoaderSimple",
     "CheckpointLoaderSimple",
@@ -165,15 +169,13 @@ chars={
 
 }
 
-for i in range(4):
+for ckptnm in random.sample(ckptnms,3)+["AOM3A1-fp16.safetensors"]:
 
-    #prompt[names["CheckpointLoaderSimple"]]["inputs"]["ckpt_name"] = os.path.basename(random.choice(ckpts))
-    pset("CheckpointLoaderSimple","ckpt_name","AOM3A1-fp16.safetensors")
-    pset("SaveImage","filename_prefix" , 
-        os.path.splitext(
-            pget("CheckpointLoaderSimple","ckpt_name")
-        )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
-    )
+    print(f"ckptnm : {ckptnm}")
+    pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
+    #pset("CheckpointLoaderSimple","ckpt_name","AOM3A1-fp16.safetensors")
+
+    #continue
     
     for j in range(4):
 
@@ -216,5 +218,9 @@ for i in range(4):
             #print(prompt)
             
             #continue
-            
+            pset("SaveImage","filename_prefix" , 
+                os.path.splitext(
+                    pget("CheckpointLoaderSimple","ckpt_name")
+                )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
+            )
             queue_prompt(prompt)
