@@ -2,7 +2,7 @@ import os, glob, sys
 import json
 from urllib import request, parse
 import random
-import wildcards
+#import wildcards
 
 prompt={}
 names={}
@@ -14,7 +14,7 @@ ckpts=glob.glob(
 )
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
 
-sys.exit()
+#sys.exit()
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
