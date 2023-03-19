@@ -2,10 +2,8 @@ import os, glob, sys
 import json
 from urllib import request, parse
 import random
-#import wildcards
+import wildcards
 
-prompt={}
-names={}
 ckpts=glob.glob(
     os.path.join(
         os.path.dirname(__file__),
@@ -14,161 +12,243 @@ ckpts=glob.glob(
 )
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
 
-#sys.exit()
+shoulder="off shoulder, bare shoulders, Strapless,"
+quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,"
+dress="{sweater|maid|princess royal|santa|lolita fashion|china|witch|wedding|yukata|kimono|} {frilled |}{long |}dress, {{puffy | }{wide |}{long |}sleeves,|} high heels, "+shoulder
+NSFW=["NSFW, breasts exposure, breastsout, nipple exposure, "]
+prompt_c="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
 
-def pget(name,input):
-    return prompt[names[name]]["inputs"][input]
-    
-def pset(name,input,value):
-    prompt[names[name]]["inputs"][input] = lget(value)
-
-def psetd(name,kv):
-    for k, v in kv.items():
-        pset(name,k,v)
-
 def cget(c,v,t):
-    p=chars[c][v] if v in chars[c] else t
+    p=c[v] if v in c else t
     return lget(p)
     
-def prompt_add(name,class_type,inputs):
-    n=f"{len(names)}"
-    names[name]=n
-    prompt[n]={
-        "class_type":class_type,
-        "inputs":inputs
-    }
-    
-
 def queue_prompt(prompt):
     p = {"prompt": prompt}
     data = json.dumps(p).encode('utf-8')
     req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
     request.urlopen(req)
-    
 
-#print(f"ckpts {ckptnms}")
+class myprompt:
 
-prompt_add(
-    "CheckpointLoaderSimple",
-    "CheckpointLoaderSimple",
-    {
-        "ckpt_name": "weriDiffusion_v10-fp16.safetensors"
-    }
-)
-"""
-prompt_add(
-    "LoraLoader",
-    "LoraLoader",
-    {
-        "model" : [names["CheckpointLoaderSimple"],0],
-        "clip" : [names["CheckpointLoaderSimple"],1],
-        "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
-        "strength_model": 1.0,
-        "strength_clip": 1.0
-    }
-)
-"""
-prompt_add(
-    "LoraLoaderTextRandom",
-    "LoraLoaderTextRandom",
-    {
-        "model" : [names["CheckpointLoaderSimple"],0],
-        "clip" : [names["CheckpointLoaderSimple"],1],
-        "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
-        "seed": random.randint(0, 0xffffffffffffffff ),
-        "strength_model_min": 0.50,
-        "strength_model_max": 1.0,
-        "strength_clip_min": 0.50,
-        "strength_clip_max": 1.0
-    }
-)
+    ckptnm="weriDiffusion_v10-fp16.safetensors"
+    #sys.exit()
 
-prompt_add(
-    "CLIPTextEncodeN",
-    "CLIPTextEncode",
-    {
-        "clip" : [names["CheckpointLoaderSimple"],1],
-        "text": "worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome"
-    }
-)
 
-prompt_add(
-    "CLIPTextEncodeP",
-    "CLIPTextEncode",
-    {
-        "clip" : [names["CheckpointLoaderSimple"],1],
-        "text": ""
-    }
-)
+    def pget(self,name,input):        
+        #print(self.prompts[self.names[name]]["inputs"])
+        return self.prompts[self.names[name]]["inputs"][input]
+        
+    def pset(self,name,input,value):
+        if type(self.prompts[self.names[name]]["inputs"][input]) is list :
+            self.prompts[self.names[name]]["inputs"][input] = value
+        else:
+            self.prompts[self.names[name]]["inputs"][input] = lget(value)
 
-prompt_add(
-    "EmptyLatentImage",
-    "EmptyLatentImage",
-    {
-        "batch_size": 1,
-        "height": 768,
-        "width": 320
-    }
-)
+    def psetd(self,name,kv):
+        for k, v in kv.items():
+            self.pset(name,k,v)
 
-prompt_add(
-    "KSampler",
-    "KSampler",
-    {
-        "model": [names["LoraLoaderTextRandom"],0],
-        "positive": [names["CLIPTextEncodeP"],0],
-        "negative": [names["CLIPTextEncodeN"],0],
-        "latent_image": [names["EmptyLatentImage"],0],
-        "sampler_name": "dpmpp_sde",
-        "scheduler": "karras",
-        "seed": random.randint(0, 0xffffffffffffffff ),
-        "steps": random.randint(20, 30 ),
-        "cfg": random.randint( int(5*2) , int(9*2) ) / 2,
-        "denoise": random.uniform(0.5,1.0) ,
-    }
-)
+    def padd(self, name,class_type,inputs):
+        n=f"{len(self.names.keys())}"
+        #print(f"names : {n}" )
+        #print(f"names : {self.names}" )
+        self.names[name]=n
+        self.prompts[n]={
+            "class_type":class_type,
+            "inputs":inputs
+        }
+        
+    def prompt_set(self,c):
+        #print(f"dict : {c}" )
+        #print(type(c))
+        if not type(c) is dict:
+            print("prompt_set error. not dict")
+            return False
+        tmp=""
+        tmp+=cget(c,"quality",self.quality)
+        tmp+=cget(c,"prompt",self.prompt_c)
+        tmp+=cget(c,"dress",self.dress)
+        tmp+=cget(c,"NSFW",self.NSFW)
+        self.pset("CLIPTextEncodeP","text", wildcards.run(tmp))
+            
+        if "lora" in c: 
+            #if "strength_model" in chars[c]: 
+            #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(chars[c]["strength_model"][0],chars[c]["strength_model"][1]) 
+            #else:
+            #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(0.25,1.0) 
+            self.pset("LoraLoaderTextRandom","lora_name",lget(c["lora"]))                
+            self.pset("LoraLoaderTextRandom","seed", random.randint(0, 0xffffffffffffffff ))
+            self.pset("KSampler","model", [self.names["LoraLoaderTextRandom"],0]   )
+            self.pset("CLIPTextEncodeP","clip", [self.names["LoraLoaderTextRandom"],1] )
+            self.pset("CLIPTextEncodeN","clip", [self.names["LoraLoaderTextRandom"],1] )
+        else:
+            #print(f"lora no {c}")
+            self.pset("KSampler","model", [self.names["CheckpointLoaderSimple"],0] )
+            self.pset("CLIPTextEncodeP","clip",[self.names["CheckpointLoaderSimple"],1] )
+            self.pset("CLIPTextEncodeN","clip",[self.names["CheckpointLoaderSimple"],1] )
+            
+            self.psetd(
+                "KSampler",
+                {
+                    "seed":random.randint(0, 0xffffffffffffffff ),
+                    "steps":random.randint(20, 30 ),
+                    "cfg":random.randint(int(5*2) , int(9*2) ) / 2,
+                    "denoise":random.uniform(0.75,1.0) ,
+                }
+            )
+        
+        #print(prompt)
+        
+        #continue
+        self.pset("SaveImage","filename_prefix" , 
+            os.path.splitext(
+                self.pget("CheckpointLoaderSimple","ckpt_name")
+            )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
+        )
+       
 
-prompt_add(
-    "VAELoader",
-    "VAELoader",
-    {
-        "vae_name": "BerrysMix.vae.safetensors"
-    }
-)
+    #print(f"ckpts {ckptnms}")
+    def __init__(self):
+        #print(f"__init__ ")
+        
+        self.prompts={}
+        self.names={}
+        self.shoulder=shoulder
+        self.quality=quality
+        self.dress=dress
+        self.NSFW=NSFW
+        self.prompt_c=prompt_c
+        
+        self.padd(
+            "CheckpointLoaderSimple",
+            "CheckpointLoaderSimpleText",
+            {
+                "ckpt_name": ckptnm
+            }
+            # model
+            # clip
+            # vae
+        )
+        """
+        prompt_add(
+            "LoraLoader",
+            "LoraLoader",
+            {
+                "model" : [names["CheckpointLoaderSimple"],0],
+                "clip" : [names["CheckpointLoaderSimple"],1],
+                "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
+                "strength_model": 1.0,
+                "strength_clip": 1.0
+            }
+        )
+        """
+        self.padd(
+            
+            "LoraLoaderTextRandom",
+            "LoraLoaderTextRandom",
+            {
+                "model" : [self.names["CheckpointLoaderSimple"],0],
+                "clip" : [self.names["CheckpointLoaderSimple"],1],
+                "lora_name": "",
+                "seed": random.randint(0, 0xffffffffffffffff ),
+                "strength_model_min": 0.50,
+                "strength_model_max": 1.0,
+                "strength_clip_min": 0.50,
+                "strength_clip_max": 1.0
+            }
+        )
 
-prompt_add(
-    "VAEDecode",
-    "VAEDecode",
-    {
-        "samples": [names["KSampler"],0],
-        "vae": [names["VAELoader"],0],
-    }
-)
+        self.padd(
+            
+            "CLIPTextEncodeN",
+            "CLIPTextEncode",
+            {
+                "clip" : [self.names["CheckpointLoaderSimple"],1],
+                "text": "worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome"
+            }
+        )
 
-prompt_add(
-    "SaveImage",
-    "SaveImage",
-    {
-        "images": [names["VAEDecode"],0],
-        "filename_prefix": "ComfyUI",
-    }
-)
+        self.padd(
+            
+            "CLIPTextEncodeP",
+            "CLIPTextEncode",
+            {
+                "clip" : [self.names["CheckpointLoaderSimple"],1],
+                "text": ""
+            }
+        )
 
-#print(names)
-#print(prompt)
+        self.padd(
+            
+            "EmptyLatentImage",
+            "EmptyLatentImage",
+            {
+                "batch_size": 1,
+                "height": 768,
+                "width": 320
+            }
+        )
 
-shoulder="off shoulder, bare shoulders, Strapless,"
-quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,"
-dress="{sweater|maid|princess royal|santa|lolita fashion|china|witch|wedding|yukata|kimono|} {frilled |}{long |}dress, {{puffy | }{wide |}{long |}sleeves,|} high heels, "+shoulder
-NSFW=["NSFW, breasts exposure, breastsout, nipple exposure, "]
-prompt_my="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
+        self.padd(
+            
+            "KSampler",
+            "KSampler",
+            {
+                "model": [self.names["LoraLoaderTextRandom"],0],
+                "positive": [self.names["CLIPTextEncodeP"],0],
+                "negative": [self.names["CLIPTextEncodeN"],0],
+                "latent_image": [self.names["EmptyLatentImage"],0],
+                "sampler_name": "dpmpp_sde",
+                "scheduler": "karras",
+                "seed": random.randint(0, 0xffffffffffffffff ),
+                "steps": random.randint(20, 30 ),
+                "cfg": random.randint( int(5*2) , int(9*2) ) / 2,
+                "denoise": random.uniform(0.5,1.0) ,
+            }
+        )
+
+        self.padd(
+            
+            "VAELoader",
+            "VAELoader",
+            {
+                "vae_name": "BerrysMix.vae.safetensors"
+            }
+        )
+
+        self.padd(
+            
+            "VAEDecode",
+            "VAEDecode",
+            {
+                "samples": [self.names["KSampler"],0],
+                "vae": [self.names["VAELoader"],0],
+            }
+        )
+
+        self.padd(
+            
+            "SaveImage",
+            "SaveImage",
+            {
+                "images": [self.names["VAEDecode"],0],
+                "filename_prefix": "ComfyUI",
+            }
+        )
+        #print( f"self.prompts {self.prompts}")
+        #print( f"self.names {self.names}")
+    #print(names)
+    #print(prompt)
+
+
+
 
 chars={ 
     "my" : {
-        "prompt" : prompt_my,
+        "prompt" : prompt_c,
         #"strength_model" : [0.5,1.0]
     },
     "diana" : {
@@ -197,62 +277,17 @@ myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 
 random.shuffle(ckptnms)
 
-#for ckptnm in random.sample(ckptnms,100)+myckpts:
-for ckptnm in ckptnms:
+for ckptnm in random.sample(ckptnms,1):#+myckpts
+#for ckptnm in ckptnms:
 
     print(f"ckptnm : {ckptnm}")
-    pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
-    #pset("CheckpointLoaderSimple","ckpt_name","AOM3A1-fp16.safetensors")
-
+    myprompt.ckptnm=ckptnm
     #continue
     
     for c  in chars:
-        for j in range(4):
-            
-            print(f"char : {c}" )
-            
-            tmp=""
-            tmp+=cget(c,"quality",quality)
-            tmp+=cget(c,"prompt",prompt_my)
-            tmp+=cget(c,"dress",dress)
-            tmp+=cget(c,"NSFW",NSFW)
-            pset("CLIPTextEncodeP","text", tmp)
-                
-            if "lora" in chars[c]: 
-                
-                pset("LoraLoaderTextRandom","lora_name",lget(chars[c]["lora"]))
-                    
-                pset("LoraLoaderTextRandom","seed", random.randint(0, 0xffffffffffffffff ))
-                #if "strength_model" in chars[c]: 
-                #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(chars[c]["strength_model"][0],chars[c]["strength_model"][1]) 
-                #else:
-                #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(0.25,1.0) 
-
-                pset("KSampler","model", [names["LoraLoaderTextRandom"],0]   )
-                pset("CLIPTextEncodeP","clip", [names["LoraLoaderTextRandom"],1] )
-                pset("CLIPTextEncodeN","clip", [names["LoraLoaderTextRandom"],1] )
-            else:
-                #print(f"lora no {c}")
-                pset("KSampler","model", [names["CheckpointLoaderSimple"],0] )
-                pset("CLIPTextEncodeP","clip",[names["CheckpointLoaderSimple"],1] )
-                pset("CLIPTextEncodeN","clip",[names["CheckpointLoaderSimple"],1] )
-                
-                psetd(
-                    "KSampler",
-                    {
-                        "seed":random.randint(0, 0xffffffffffffffff ),
-                        "steps":random.randint(20, 30 ),
-                        "cfg":random.randint(int(5*2) , int(9*2) ) / 2,
-                        "denoise":random.uniform(0.75,1.0) ,
-                    }
-                )
-            
-            #print(prompt)
-            
-            #continue
-            pset("SaveImage","filename_prefix" , 
-                os.path.splitext(
-                    pget("CheckpointLoaderSimple","ckpt_name")
-                )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
-            )
-            queue_prompt(prompt)
+        for j in range(1):
+            m=myprompt()            
+            m.prompt_set(chars[c])
+            #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
+            print(m.prompts)
+            queue_prompt(m.prompts)
