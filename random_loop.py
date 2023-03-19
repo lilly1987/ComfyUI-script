@@ -247,28 +247,29 @@ class myprompt:
 
 
 chars={ 
-    "my" : {
-        "prompt" : prompt_c,
-        #"strength_model" : [0.5,1.0]
-    },
-    "diana" : {
-        "prompt" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
-        "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors",
-        
-    },
-    "schnee" : {
-        "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
-        "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"],
-    },
-    "Tomoyo" : {
-        "prompt" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
-        #"dress" : [ "" ,dress],
-        "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
-    },
     "SaegusaMayumi" : {
         "prompt" : "mayumi,",
         "dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose, " ,dress],
         "lora" : ["SaegusaMayumiTheIrregularAt_mayumi"],
+    },
+    "Tomoyo" : {
+        "prompt" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
+        "dress" : "{__character_dress__}" ,
+        "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
+    },
+    "diana" : {
+        "prompt" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors",
+        "dress": "{__character_dress__|__diana_cavendish_dress__},"
+    },
+    "schnee" : {
+        "prompt" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"],
+        #"dress": "{__character_dress__|__diana_cavendish_dress__},"
+    },
+    "my" : {
+        "prompt" : prompt_c,
+        #"strength_model" : [0.5,1.0]
     },
 
 }
@@ -277,7 +278,7 @@ myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 
 random.shuffle(ckptnms)
 
-for ckptnm in random.sample(ckptnms,1):#+myckpts
+for ckptnm in random.sample(ckptnms,5):#+myckpts
 #for ckptnm in ckptnms:
 
     print(f"ckptnm : {ckptnm}")
@@ -285,7 +286,8 @@ for ckptnm in random.sample(ckptnms,1):#+myckpts
     #continue
     
     for c  in chars:
-        for j in range(1):
+        for j in range(4):
+        
             m=myprompt()            
             m.prompt_set(chars[c])
             #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
