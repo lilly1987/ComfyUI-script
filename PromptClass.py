@@ -54,9 +54,12 @@ def cadd(c,v,t):
     return c[v]
     
 def caddin(c,v,t):
+    
     if v in c:
+        #print(f"c[v] : {c[v]}")
         if t in c[v]:
             return
+        c[v]+=c[v]+t
     else:
         c[v]=t
         return c[v]
@@ -65,7 +68,7 @@ def cget(c,v,t):
     p=c[v] if v in c else t
     return lget(p)
     
-def queue_prompt(prompt):
+def queue_prompt(prompt, max=1):
     
     while True:
         req =  request.Request("http://127.0.0.1:8188/prompt")        
@@ -76,9 +79,9 @@ def queue_prompt(prompt):
             #print(f"data : {data}" )
             cnt=ld['exec_info']['queue_remaining']
             
-            if cnt <1:
+            if cnt <max:
                 break
-            print(f"wait queue cnt. now {cnt} < max 1" )
+            print(f"wait queue cnt. now {cnt} < max {max}" )
             time.sleep(2)
         
     p = {"prompt": prompt}
@@ -134,6 +137,7 @@ class PromptClass:
             r.append(lambda c: cget(c,"prompt",self.char))
             r.append(lambda c: cget(c,"dress",self.dress))
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
+            r.append(lambda c: cget(c,"NSFW_add","")  )
             r.append(lambda c: cget(c,"acc",self.acc)  )
             random.shuffle(r)
             for f in r:

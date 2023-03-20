@@ -42,12 +42,12 @@ chars={
     },
     "lillie" : {
         "char" : "character_pokemon_lillie, hat,",
-        "negative" : "__no2d__",
+        #"negative" : "__no2d__",
         "lora" : "pokemonLillieLilieSD15_v4"
     },
     "sailorMercury" : {
         "char" : "sailormercury, hat,",
-        "negative" : "__no2d__",
+       # "negative" : "__no2d__",
         "lora" : "sailorMercury_v10"
     },
     "lovedollLikenessMiyou" : {
@@ -60,9 +60,19 @@ chars={
         #"negative" : "__no3d__",
         "lora" : "ShiningBladeIra_ira"
     },
+    "riceShowerUmamusume_v10" : {
+        "char" : "(rice shower \(umamusume\)),",
+       # "negative" : "__no2d__",
+        "lora" : "riceShowerUmamusume_v10"
+    },
+    "solutionEpsilon_v10" : {
+        "char" : "solution_epsilon,",
+        #"negative" : "__no2d__",
+        "lora" : "solutionEpsilon_v10"
+    },
     "my" : {
         "positive" : "__my__",
-        "negative" : "__no2d__",
+        #"negative" : "__no2d__",
         #"strength_model" : [0.5,1.0]
     },
 
@@ -89,14 +99,14 @@ while True:
             #chars[c]["loraList"]=["amazonPositionSexAct_v10"]
             if random.choice([True, False]):
                 m.lora_add("amazonPositionSexAct_v10")
-                caddin(chars[c],"NSFW","sex,pussy,")
+                caddin(chars[c],"NSFW_add","sex,pussy,")
             if random.choice([True, False]):
                 m.lora_add(random.choice(loranms))
             m.prompt_set(chars[c])
             #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
             
             print(m.prompts)
-            queue_prompt(m.prompts)
+            queue_prompt(m.prompts,2)
 
 
 
