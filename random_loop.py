@@ -2,6 +2,7 @@ import os, glob, sys
 import json
 from urllib import request, parse
 import random
+import time
 
 wildcardsOn=False
 try:
@@ -32,10 +33,28 @@ def cget(c,v,t):
     return lget(p)
     
 def queue_prompt(prompt):
+    
+    while True:
+        req =  request.Request("http://127.0.0.1:8188/prompt")        
+        with request.urlopen(req) as response:
+            html = response.read().decode("utf-8")            
+            #print(type(html))
+            ld=json.loads(html)
+            #print(f"data : {data}" )
+            cnt=ld['exec_info']['queue_remaining']
+            
+            if cnt <1:
+                break
+            print(f"wait queue cnt. now {cnt} < max 1" )
+            time.sleep(2)
+        
     p = {"prompt": prompt}
     data = json.dumps(p).encode('utf-8')
     req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
     request.urlopen(req)
+    print(f"send" )
+    time.sleep(2)
+
 
 class myprompt:
 
@@ -308,7 +327,7 @@ myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
 wildcardsOn=False
 random.shuffle(ckptnms)
 
-for ckptnm in random.sample(ckptnms,50):#+myckpts
+for ckptnm in random.sample(ckptnms,100):#+myckpts
 #for ckptnm in ckptnms:
 
     print(f"ckptnm : {ckptnm}")
