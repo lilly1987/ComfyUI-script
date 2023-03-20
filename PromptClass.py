@@ -44,7 +44,10 @@ acc="{acc,|}"
 NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
 char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
 negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
-positive=quality + char + dress + shoulder + NSFW + acc
+focus=""
+pose=""
+positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus
+
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
@@ -103,6 +106,9 @@ class PromptClass:
         return self.prompts[self.names[name]]["inputs"][input]
         
     def pset(self,name,input,value):
+        print(f"pset : {name}")
+        print(f"pset : {self.names[name]}")
+        print(f"pset : {self.prompts[self.names[name]]['inputs']}")
         if type(self.prompts[self.names[name]]["inputs"][input]) is list :
             self.prompts[self.names[name]]["inputs"][input] = value
         else:
@@ -114,14 +120,44 @@ class PromptClass:
 
     def padd(self, name,class_type,inputs):
         n=f"{len(self.names.keys())}"
-        #print(f"names : {n}" )
-        #print(f"names : {self.names}" )
         self.names[name]=n
         self.prompts[n]={
             "class_type":class_type,
             "inputs":inputs
         }
+        print(f"padd : {name}" )
+        print(f"padd : {self.names}" )
         
+        
+    def lora_add(self, name):
+        print(f"lora_add : {name}")
+        n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
+        self.padd(
+            n,
+            "LoraLoaderTextRandom",
+            {
+                "model" : [self.loraModelLast,0],
+                "clip"  : [self.loraClipLast ,1],
+                "lora_name": name,
+                "seed": random.randint(0, 0xffffffffffffffff ),
+                "strength_model_min": 0.50,
+                "strength_model_max": 1.0,
+                "strength_clip_min": 0.50,
+                "strength_clip_max": 1.0
+            }
+        )
+        
+        self.loraModelLast=self.names[n]
+        self.loraClipLast =self.names[n]
+        self.lora_add_after()
+        return n
+        
+    def lora_add_after(self):
+        self.pset("KSampler"        , "model", [self.loraModelLast,0])
+        self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
+        self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
+        
+
     def prompt_set(self,c):
         #print(f"dict : {c}" )
         #print(type(c))
@@ -141,6 +177,8 @@ class PromptClass:
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
             r.append(lambda c: cget(c,"NSFW_add","")  )
             r.append(lambda c: cget(c,"acc",self.acc)  )
+            r.append(lambda c: cget(c,"focus",self.focus)  )
+            r.append(lambda c: cget(c,"pose",self.pose)  )
             random.shuffle(r)
             for f in r:
                 tmp+=f(c)
@@ -184,34 +222,7 @@ class PromptClass:
         #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
         #)
         
-    def lora_add(self, name):
-        print(f"lora_add : {name}")
-        n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
-        self.padd(
-            n,
-            "LoraLoaderTextRandom",
-            {
-                "model" : [self.loraModelLast,0],
-                "clip"  : [self.loraClipLast ,1],
-                "lora_name": name,
-                "seed": random.randint(0, 0xffffffffffffffff ),
-                "strength_model_min": 0.50,
-                "strength_model_max": 1.0,
-                "strength_clip_min": 0.50,
-                "strength_clip_max": 1.0
-            }
-        )
-        
-        self.loraModelLast=self.names[n]
-        self.loraClipLast =self.names[n]
-        
-        self.lora_add_after()
-        
-    def lora_add_after(self):
-        self.pset("KSampler"        , "model", [self.loraModelLast,0])
-        self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
-        self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
-        
+
     #print(f"ckpts {ckptnms}")
     def __init__(self):
         #print(f"__init__ ")
@@ -224,6 +235,8 @@ class PromptClass:
         self.NSFW=NSFW
         self.char=char
         self.acc=acc
+        self.focus=focus
+        self.pose=pose
        
         self.padd(
             "CheckpointLoaderSimple",

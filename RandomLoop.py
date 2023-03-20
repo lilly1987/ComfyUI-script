@@ -6,16 +6,19 @@ import time
 #from LinkedList import LinkedList 
 import time
 from PromptClass import *
+import copy  
 
 dress="{__character_dress__|__dress_my__|},__acc_my__,"
 shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
 quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
 dress="{__character_dress__|__dress_my__|},__acc_my__,"
 NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,"
+pose="{standing,|}"
+focus="{full body,|}"
 acc="{__acc_my__|}"
 char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
 negative="__no2d__"
-positive=quality + char + dress + shoulder + NSFW + acc
+positive=quality + char + dress + shoulder + NSFW + acc + focus + pose
 
 chars={ 
     "SaegusaMayumi" : {
@@ -130,6 +133,11 @@ chars={
         "negative" : "__no3d__",
         "lora" : "liyuuLora_liyuuV1"
     },
+    "IrisPokemon_v10" : {
+        "char" : "irisa, irisb, irisc,",
+        #"negative" : "__no3d__",
+        "lora" : "IrisPokemon_v10"
+    },
     "my" : {
         "positive" : "__my__",
         #"negative" : "__no2d__",
@@ -153,7 +161,7 @@ loradic={
     "artistHimitsu_v10" : "Artist_Himitsu, sexy,porn, blush,sweat,saliva, gag, ",
     "artistMeito_v10" : "Artist_Meito, sex,porn, blush,sweat,saliva, orgasm, ahegao, rape, speech bubble, ",
     "fromBelowPOV_v1" : "from_below,  foreshortening ,uncensored,pussy, no panties,",
-    "lrCumInStomach_lrCumInStomachV10" : "deepthroat, fellatio, x-ray, cum in stomach,",
+    #"lrCumInStomach_lrCumInStomachV10" : "deepthroat, fellatio, x-ray, cum in stomach,",
 }
 def loradicRandom(m,c):
     loradnm=random.choice(list(loradic.keys()))
@@ -166,27 +174,40 @@ while True:
     
     random.shuffle(keys)
     for c in keys:
+        c=random.choice(["SaegusaMayumi","Tomoyo","diana"])
         for j in range(2):
+            cc=copy.deepcopy(chars[c])
             if ckptcnt ==0 :
                 PromptClass.ckptnm=random.choice(ckptnms)
-                ckptcnt=8
+                #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
+                ckptcnt=6
             ckptcnt-=1
             m=PromptClass()            
             #chars[c]["loraList"]=["amazonPositionSexAct_v10"]
-            loradicRandom(m,chars[c])
-            if random.choice([True, False]):
-                m.lora_add(random.choice(loranms))
-            if random.choice([True, False]):
-                m.lora_add("hunged_girl")
-                caddin(chars[c],"NSFW_add","__hunged_girl__")
-            m.prompt_set(chars[c])
-            #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
+            
+            loradicRandom(m,cc)
+            
+            #if random.choice([True, False]):
+            #    m.lora_add(random.choice(loranms))
+            
+            #if random.choice([True, False]):
+            nm=m.lora_add("hunged_girl")
+            m.pset(nm,"strength_model_min",0.75)
+            m.pset(nm,"strength_clip_min",0.75)
+            caddin(cc,"NSFW_add","__hunged_girl__")
+            
+                #chars[c]["NSFW"]=chars[c]["NSFW"]+"__hunged_girl__"
+            m.pset("EmptyLatentImage","height",768+64*1)
+            m.pset("EmptyLatentImage","width",320+64*1)
+            
+            m.prompt_set(cc)
             
             print(m.prompts)
-            queue_prompt(m.prompts,2)
+            queue_prompt(m.prompts,1)
 
 
 #======================
+"""
 for ckptnm in random.sample(ckptnms,min(20,len(ckptnms))):#+myckpts
 #for ckptnm in ckptnms:
 
@@ -229,3 +250,5 @@ for ckptnm in random.sample(ckptnms,min(20,len(ckptnms))):#+myckpts
     #        #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
     #        print(m.prompts)
     #        queue_prompt(m.prompts)
+    
+    """
