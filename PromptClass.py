@@ -136,15 +136,15 @@ class PromptClass:
             for lora in c["loraList"]:
                 self.lora_add(lget(lora))
         #--------------------------------
-        self.psetd(
-            "KSampler",
-            {
-                "seed":random.randint(0, 0xffffffffffffffff ),
-                "steps":random.randint(20, 30 ),
-                "cfg":random.randint(int(5*2) , int(9*2) ) / 2,
-                "denoise":random.uniform(0.75,1.0) ,
-            }
-        )
+        #self.psetd(
+        #    "KSampler",
+        #    {
+        #        "seed":random.randint(0, 0xffffffffffffffff ),
+        #        "steps":random.randint(20, 30 ),
+        #        "cfg":random.randint(int(5*2) , int(9*2) ) / 2,
+        #        "denoise":random.uniform(0.75,1.0) ,
+        #    }
+        #)
         #--------------------------------
         #self.pset("SaveImage","filename_prefix" , 
         #    os.path.splitext(
