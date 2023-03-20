@@ -30,23 +30,76 @@ card_path=os.path.dirname(__file__)+"\\..\\..\\wildcards\\**\\*.txt"
 print(f"wildcards card_path {card_path}")
 
 # 정규식
-resub  = re.compile(r"(\{)([^\{\}]*)(\})")
+#resub  = re.compile(r"(\{)([^\{\}]*)(\})")
+resub  = re.compile(r"(\{)(((\d+)|(\d+)?-(\d+)?)?\$\$)?([^\{\}]*)(\})")
 recard = re.compile(r"(__)(.*?)(__)")
 
 # 카드 목록
 cards = {}
+seperator=", "
+loop_max=50
 
 # | 로 입력된것중 하나 가져오기
 def sub(match):
-    m=match.group(2).split("|")
-    #print(f"sub : {m}")
-    return random.choice(m)
+    #print(f"sub : {(match.groups())}")
+    try:        
+        #m=match.group(2)
+        s=match.group(3)
+        m=match.group(7).split("|")
+
+        #print(f"m : {m}")
+        if s is None:
+            return random.choice(m)
+
+        n=int(match.group(4)) if  match.group(4) else None
+        if n:
+            r=seperator.join(random.sample(m,n))
+            #print(f"n : {n} ; {r}")
+            return r
+
+        n1=match.group(5)
+        n2=match.group(6)
+        c=len(m)
+        if n1 or n2:
+            a=min(int(n1 if n1 else c), int(n2 if n2 else c))
+            b=max(int(n1 if n1 else 0), int(n2 if n2 else 0))         
+            #print(f"ab : {a} ; {b}")
+            r=seperator.join(
+                random.sample(
+                    m,
+                    random.randint(
+                        a,b
+                    )
+                )
+            )
+            #n1=int(match.group(5)) if not match.group(5) is None 
+            #n2=int(match.group(6)) if not match.group(6) is None 
+        else:
+            r=seperator.join(
+                random.sample(
+                    m,
+                    random.randint(
+                        0,c
+                    )
+                )
+            )
+        #print(f"12 : {r}")
+        return r
+
+
+    except Exception as e:         
+        print(f"Error : {match.groups()}")
+        print(f"Exception : {e}")
+        return ""
+        
+        
 
 # | 로 입력된것중 하나 가져오기 반복
 def sub_loop(text):
     bak=text
-    for i in range(1, 50):
+    for i in range(1, loop_max):
         tmp=resub.sub(sub, bak)
+        #print(f"tmp : {tmp}")
         if bak==tmp :
             return tmp
         bak=tmp
@@ -66,7 +119,7 @@ def card(match):
 # 카드 중에서 가져오기 반복. | 의 것도 처리
 def card_loop(text):
     bak=text
-    for i in range(1, 50):
+    for i in range(1, loop_max):
         tmp=recard.sub(card, bak)
         #print(f"card l : {bak}")
         if bak==tmp :
@@ -118,9 +171,10 @@ def run(text):
 # ============================================================
 
 # 테스트용
-test="__my__"
+test="{3$$a1|{b2|c3|}|d4|{-$$|f|g}|{-2$$h||i}|{1-$$j|k|}}/{$$l|m|}/{0$$n|}"
 
 #m = p.sub(sub, test)
 #print(m)
-
-run(test)
+#print(__name__)
+if __name__ == '__main__' :
+    print(run(test))
