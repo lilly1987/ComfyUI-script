@@ -1,2 +1,2 @@
-..\..\python_embeded\python.exe %~dp0\ckpt2safetensors.py
-rem ./ckpt2safetensors.py
+..\..\..\python_embeded\python.exe .\ckpt2safetensors-ComfyUI.py
+rem ./ckpt2safetensors.py %~dp0

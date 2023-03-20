@@ -61,6 +61,8 @@ def caddin(c,v,t):
             return
         c[v]+=c[v]+t
     else:
+        #print(f"c : {c}")
+        #print(f"c[v] : {c[v]}")
         c[v]=t
         return c[v]
     
@@ -183,6 +185,7 @@ class PromptClass:
         #)
         
     def lora_add(self, name):
+        print(f"lora_add : {name}")
         n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
         self.padd(
             n,

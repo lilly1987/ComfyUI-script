@@ -21,7 +21,7 @@ path, filename = os.path.split(absFilePath)
 print("Script file path is {}, filename is {}".format(path, filename))
 
     
-for (path, dir, files) in os.walk("..\\models\\checkpoints"):
+for (path, dir, files) in os.walk("..\\..\\models\\checkpoints"):
     for f in files:
 
         f = os.path.join(path, f)
