@@ -50,19 +50,20 @@ def sub(match):
         #print(f"m : {m}")
         if s is None:
             return random.choice(m)
-
+        c=len(m)
         n=int(match.group(4)) if  match.group(4) else None
         if n:
-            r=seperator.join(random.sample(m,n))
+
+            r=seperator.join(random.sample(m,min(n,c)))
             #print(f"n : {n} ; {r}")
             return r
 
         n1=match.group(5)
         n2=match.group(6)
-        c=len(m)
+        
         if n1 or n2:
-            a=min(int(n1 if n1 else c), int(n2 if n2 else c))
-            b=max(int(n1 if n1 else 0), int(n2 if n2 else 0))         
+            a=min(int(n1 if n1 else c), int(n2 if n2 else c),c)
+            b=min(max(int(n1 if n1 else 0), int(n2 if n2 else 0)),c)
             #print(f"ab : {a} ; {b}")
             r=seperator.join(
                 random.sample(
@@ -170,11 +171,11 @@ def run(text):
     
 # ============================================================
 
-# 테스트용
-test="{3$$a1|{b2|c3|}|d4|{-$$|f|g}|{-2$$h||i}|{1-$$j|k|}}/{$$l|m|}/{0$$n|}"
-
 #m = p.sub(sub, test)
 #print(m)
 #print(__name__)
 if __name__ == '__main__' :
+    # 테스트용
+    test="{3$$a1|{b2|c3|}|d4|{-$$|f|g}|{-2$$h||i}|{1-$$j|k|}}/{$$l|m|}/{0$$n|}"
     print(run(test))
+    print(run("{9$$a|b}"))
