@@ -20,25 +20,47 @@ except:
 ckpts_path=os.path.join(
         os.path.dirname(__file__),
         "..\\..\\models\\checkpoints"
-    )+"\\*-fp16.safetensors"
+    )+"\\*fp16.safetensors"
 ckpts=glob.glob(ckpts_path)
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
-print(f"ckptn cnt : {len(ckptnms)}")
+print(f"ckpts cnt : {len(ckptnms)}")
+print(f"ckpts dat : {ckptnms[0]}")
 if len(ckptnms) ==0 :
-    print(f"!!!!!!!!!! ckptn cnt 0 !!!!!!!!!!!!!")
+    print(f"!!!!!!!!!! ckpts cnt 0 !!!!!!!!!!!!!")
     
+loras_path=os.path.join(
+        os.path.dirname(__file__),
+        "..\\..\\models\\loras"
+    )+"\\*.safetensors"
+loras=glob.glob(loras_path)
+loranms=[os.path.basename(lora) for lora in loras]
+print(f"loras cnt : {len(loranms)}")
+print(f"loras dat : {loranms[0]}")
 
 shoulder="off shoulder, bare shoulders, Strapless,"
 quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
 dress="dress,"
+acc="{acc,|}"
 NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
 char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
 negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
-positive=quality + char + dress + shoulder + NSFW
+positive=quality + char + dress + shoulder + NSFW + acc
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
 
+def cadd(c,v,t):
+    c[v]=c[v]+t if v in c else t
+    return c[v]
+    
+def caddin(c,v,t):
+    if v in c:
+        if t in c[v]:
+            return
+    else:
+        c[v]=t
+        return c[v]
+    
 def cget(c,v,t):
     p=c[v] if v in c else t
     return lget(p)
@@ -112,6 +134,7 @@ class PromptClass:
             r.append(lambda c: cget(c,"prompt",self.char))
             r.append(lambda c: cget(c,"dress",self.dress))
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
+            r.append(lambda c: cget(c,"acc",self.acc)  )
             random.shuffle(r)
             for f in r:
                 tmp+=f(c)
@@ -124,6 +147,9 @@ class PromptClass:
             tmp=c["negative"]
         else:
             tmp=self.pget("CLIPTextEncodeN","text")
+            
+        if "negative_add" in c:
+            tmp+=c["negative_add"]
             
         if wildcardsOn:
             tmp=wildcards.run(tmp)
@@ -190,6 +216,7 @@ class PromptClass:
         self.dress=dress
         self.NSFW=NSFW
         self.char=char
+        self.acc=acc
        
         self.padd(
             "CheckpointLoaderSimple",
