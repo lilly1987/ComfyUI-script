@@ -3,6 +3,7 @@ import json
 from urllib import request, parse
 import random
 import time
+#from LinkedList import LinkedList 
 
 wildcardsOn=False
 try:
@@ -60,7 +61,7 @@ class myprompt:
 
     ckptnm="weriDiffusion_v10-fp16.safetensors"
     #sys.exit()
-
+    
 
     def pget(self,name,input):        
         #print(self.prompts[self.names[name]]["inputs"])
@@ -110,31 +111,11 @@ class myprompt:
         else:
             self.pset("CLIPTextEncodeP","text", tmp)
         
-
         if "negative" in c:
             if wildcardsOn:
                 self.pset("CLIPTextEncodeN","text", wildcards.run(c["negative"]))
             else:
                 self.pset("CLIPTextEncodeN","text", c["negative"])
-            
-
-        
-        
-        if "lora" in c: 
-            #if "strength_model" in chars[c]: 
-            #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(chars[c]["strength_model"][0],chars[c]["strength_model"][1]) 
-            #else:
-            #    prompt[names["LoraLoaderTextRandom"]]["inputs"]["strength_model"] =  random.uniform(0.25,1.0) 
-            self.pset("LoraLoaderTextRandom","lora_name",lget(c["lora"]))                
-            self.pset("LoraLoaderTextRandom","seed", random.randint(0, 0xffffffffffffffff ))
-            self.pset("KSampler","model", [self.names["LoraLoaderTextRandom"],0]   )
-            self.pset("CLIPTextEncodeP","clip", [self.names["LoraLoaderTextRandom"],1] )
-            self.pset("CLIPTextEncodeN","clip", [self.names["LoraLoaderTextRandom"],1] )
-        else:
-            #print(f"lora no {c}")
-            self.pset("KSampler","model", [self.names["CheckpointLoaderSimple"],0] )
-            self.pset("CLIPTextEncodeP","clip",[self.names["CheckpointLoaderSimple"],1] )
-            self.pset("CLIPTextEncodeN","clip",[self.names["CheckpointLoaderSimple"],1] )
             
             self.psetd(
                 "KSampler",
@@ -146,16 +127,42 @@ class myprompt:
                 }
             )
         
-        #print(prompt)
-        
-        #continue
-        self.pset("SaveImage","filename_prefix" , 
-            os.path.splitext(
-                self.pget("CheckpointLoaderSimple","ckpt_name")
-            )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
-        )
+        if "lora" in c: 
+            self.lora_add(lget(c["lora"]))
+        #self.pset("SaveImage","filename_prefix" , 
+        #    os.path.splitext(
+        #        self.pget("CheckpointLoaderSimple","ckpt_name")
+        #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
+        #)
        
 
+    def lora_add(self, name):
+        n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
+        self.padd(
+            n,
+            "LoraLoaderTextRandom",
+            {
+                "model" : [self.loraModelLast,0],
+                "clip"  : [self.loraClipLast ,1],
+                "lora_name": name,
+                "seed": random.randint(0, 0xffffffffffffffff ),
+                "strength_model_min": 0.50,
+                "strength_model_max": 1.0,
+                "strength_clip_min": 0.50,
+                "strength_clip_max": 1.0
+            }
+        )
+        
+        self.loraModelLast=self.names[n]
+        self.loraClipLast =self.names[n]
+        
+        self.lora_add_after()
+        
+    def lora_add_after(self):
+        self.pset("KSampler"        , "model", [self.loraModelLast,0])
+        self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
+        self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
+        
     #print(f"ckpts {ckptnms}")
     def __init__(self):
         #print(f"__init__ ")
@@ -167,7 +174,7 @@ class myprompt:
         self.dress=dress
         self.NSFW=NSFW
         self.prompt_c=prompt_c
-        
+       
         self.padd(
             "CheckpointLoaderSimple",
             "CheckpointLoaderSimpleText",
@@ -178,18 +185,10 @@ class myprompt:
             # clip
             # vae
         )
-        """
-        prompt_add(
-            "LoraLoader",
-            "LoraLoader",
-            {
-                "model" : [names["CheckpointLoaderSimple"],0],
-                "clip" : [names["CheckpointLoaderSimple"],1],
-                "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
-                "strength_model": 1.0,
-                "strength_clip": 1.0
-            }
-        )
+
+        self.loraModelLast=self.names["CheckpointLoaderSimple"]
+        self.loraClipLast =self.names["CheckpointLoaderSimple"]
+
         """
         self.padd(
             
@@ -206,13 +205,27 @@ class myprompt:
                 "strength_clip_max": 1.0
             }
         )
+        """
+        """
+        self.padd(
+            "LoraLoader",
+            "LoraLoader",
+            {
+                "model" : [names["CheckpointLoaderSimple"],0],
+                "clip" : [names["CheckpointLoaderSimple"],1],
+                "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
+                "strength_model": 1.0,
+                "strength_clip": 1.0
+            }
+        )
+        """
 
         self.padd(
             
             "CLIPTextEncodeN",
             "CLIPTextEncodeWildcards",
             {
-                "clip" : [self.names["CheckpointLoaderSimple"],1],
+                "clip" : [self.loraClipLast,1],
                 "text": "__no2d__"
             }
         )
@@ -222,7 +235,7 @@ class myprompt:
             "CLIPTextEncodeP",
             "CLIPTextEncodeWildcards",
             {
-                "clip" : [self.names["CheckpointLoaderSimple"],1],
+                "clip" : [self.loraClipLast,1],
                 "text": ""
             }
         )
@@ -243,7 +256,7 @@ class myprompt:
             "KSampler",
             "KSampler",
             {
-                "model": [self.names["LoraLoaderTextRandom"],0],
+                "model": [self.loraModelLast,0],
                 "positive": [self.names["CLIPTextEncodeP"],0],
                 "negative": [self.names["CLIPTextEncodeN"],0],
                 "latent_image": [self.names["EmptyLatentImage"],0],
@@ -281,7 +294,9 @@ class myprompt:
             "SaveImage",
             {
                 "images": [self.names["VAEDecode"],0],
-                "filename_prefix": "ComfyUI",
+                "filename_prefix": os.path.splitext(
+                    self.pget("CheckpointLoaderSimple","ckpt_name")
+                )[0]+"-"+str(random.randint(0, 0xffffffffffffffff )),
             }
         )
         #print( f"self.prompts {self.prompts}")
@@ -342,8 +357,10 @@ for ckptnm in random.sample(ckptnms,100):#+myckpts
         for j in range(4):
             
             m=myprompt()            
+
             m.prompt_set(chars[c])
             #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
+            
             print(m.prompts)
             queue_prompt(m.prompts)
     #c="SaegusaMayumi"
