@@ -267,8 +267,8 @@ class PromptClass:
             "model" : [self.loraModelLast,0],
             "clip"  : [self.loraClipLast ,1],
             "lora_name": name,
-            "strength_model": 0.0,
-            "strength_clip": 0.0,
+            "strength_model": random.uniform(0.5,1.0),
+            "strength_clip" : random.uniform(0.5,1.5),
         }    ]
         
     def LoraLoaderR(self,name):
@@ -279,10 +279,10 @@ class PromptClass:
             "clip"  : [self.loraClipLast ,1],
             "lora_name": name,
             "seed": random.randint(0, 0xffffffffffffffff ),
-            "strength_model_min": 0.0,
-            "strength_model_max": 1.0,
-            "strength_clip_min": 0.0,
-            "strength_clip_max": 1.0
+            "strength_model_min": 0.50,
+            "strength_model_max": 1.00,
+            "strength_clip_min" : 0.50,
+            "strength_clip_max" : 1.50
         }]
     
     def lora_add(self, name):
