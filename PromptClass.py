@@ -4,7 +4,7 @@ from urllib import request, parse
 import random
 import copy
 import time
-
+import types
 #----------------------------
 """
 This script is written under the premise of using my own node.
@@ -220,10 +220,11 @@ class PromptClass:
     acc="{acc,|}"
     NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
     char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
+    body="small breasts, slender, nature, curvy,"
     negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
     focus=""
     pose=""
-    positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus
+    positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus + body
     
     #----------------------------
     def pget(self,name,input):        
@@ -255,22 +256,42 @@ class PromptClass:
         #print(f"padd : {self.names}" )
         
     #----------------------------
+    
+    
+    
+    def LoraLoaderT(self,name):
+        return [
+        "LoraLoaderText",
+        {
+            "model" : [self.loraModelLast,0],
+            "clip"  : [self.loraClipLast ,1],
+            "lora_name": name,
+            "strength_model": 0.0,
+            "strength_clip": 0.0,
+        }    ]
+        
+    def LoraLoaderR(self,name):
+        return [
+        "LoraLoaderTextRandom",
+        {
+            "model" : [self.loraModelLast,0],
+            "clip"  : [self.loraClipLast ,1],
+            "lora_name": name,
+            "seed": random.randint(0, 0xffffffffffffffff ),
+            "strength_model_min": 0.0,
+            "strength_model_max": 1.0,
+            "strength_clip_min": 0.0,
+            "strength_clip_max": 1.0
+        }]
+    
     def lora_add(self, name):
         #print(f"lora_add : {name}")
         n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
+        t=self.LoraLoader(name)
         self.padd(
             n,
-            "LoraLoaderTextRandom",
-            {
-                "model" : [self.loraModelLast,0],
-                "clip"  : [self.loraClipLast ,1],
-                "lora_name": name,
-                "seed": random.randint(0, 0xffffffffffffffff ),
-                "strength_model_min": 0.0,
-                "strength_model_max": 1.0,
-                "strength_clip_min": 0.0,
-                "strength_clip_max": 1.0
-            }
+            t[0],
+            t[1]
         )
         
         self.loraModelLast=self.names[n]
@@ -280,7 +301,7 @@ class PromptClass:
             self.loratag[name]+=[n]
         else:
             self.loratag[name]=[n]
-        print(f"loratag[{name}] : {self.loratag[name]}")
+        #print(f"loratag[{name}] : {self.loratag[name]}")
         return n
         
     def lora_add_after(self):
@@ -316,10 +337,15 @@ class PromptClass:
         
         #--------------------------------
         tmp=""
+        r=[]
         if "positive" in c:        
-            r=[lambda c: c["positive"]]
+            if type(c["positive"]) is list:            
+                for t in c["positive"]:
+                    print(f"positive : { t }")
+                    r.append(t)
+            else:
+                r.append(lambda c: c["positive"])
         else:
-            r=[]
             r.append(lambda c: cget(c,"quality",self.quality))
             r.append(lambda c: cget(c,"char",self.char))
             r.append(lambda c: cget(c,"dress",self.dress))
@@ -328,13 +354,19 @@ class PromptClass:
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
             r.append(lambda c: cget(c,"focus",self.focus)  )
             r.append(lambda c: cget(c,"pose",self.pose)  )
+            r.append(lambda c: cget(c,"body",self.body)  )
         
         r.append(lambda c: cget(c,"NSFW_add","")  )
         random.shuffle(r)
         for f in r:
             print(type(f))
-            print(f)
-            tmp+=f(c)
+            #print(f)
+            if type(f) is types.FunctionType:
+                t=f(c)
+            else:
+                t=f
+            print(t)
+            tmp+=t
         
         if wildcardsOn:
             tmp=wildcards.run(tmp)
@@ -398,10 +430,11 @@ class PromptClass:
         self.acc=PromptClass.acc
         self.focus=PromptClass.focus
         self.pose=PromptClass.pose
+        self.body=PromptClass.body
         self.ckptnm=PromptClass.ckptnm
         self.vae_name=PromptClass.vae_name
         self.loratag={}
-        
+        self.LoraLoader=self.LoraLoaderT
         self.padd(
             "CheckpointLoaderSimple",
             "CheckpointLoaderSimpleText",

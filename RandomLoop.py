@@ -21,9 +21,9 @@ PromptClass.NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.
 PromptClass.pose="{standing,|}"
 PromptClass.focus="{full body,|}"
 PromptClass.acc="{__acc_my__|}"
-PromptClass.char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
+PromptClass.char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __body1__"
 PromptClass.negative="__no2d__"
-PromptClass.positive=PromptClass.quality + PromptClass.char + PromptClass.dress + PromptClass.shoulder + PromptClass.NSFW + PromptClass.acc + PromptClass.focus + PromptClass.pose
+PromptClass.positive=PromptClass.quality + PromptClass.char + PromptClass.dress + PromptClass.shoulder + PromptClass.NSFW + PromptClass.acc + PromptClass.focus + PromptClass.pose + PromptClass.body
 #----------------------------
 
 chars={ 
@@ -170,6 +170,7 @@ ckptnmsmy=[
     "AOM3-fp16",
     "AOM3A1-fp16",
     "AOM3A1B-fp16",
+    "AikimiXCv1.5-fp16",
     "AnyTwam-pruned-fp16"
     "Balor-V3.1featACT-fp16",
     "dreamboxMix-A-fp16-fp16",
@@ -205,7 +206,7 @@ while True:
                 ckptcnt=6
             ckptcnt-=1
             if random.choice([True, False]):
-                cc["positive"]="__quality1__,__mayumi__,__dress1__,__hunged_girl1__,__NSFW1__,"
+                cc["positive"]=["__quality1__,","__dress1__,","__hunged_girl1__,","__NSFW1__,","__body1__,",cc["char"]]
             
             m=PromptClass(cc)            
             r=m.promptSet()
@@ -216,10 +217,13 @@ while True:
                 print(f"chars[c]['lora'] : {cc['lora']}")
                 print(f"chars[c]['lora'] : {type(cc['lora'])}")
                 print(f"loratag : {m.loratag}")
+                if m.LoraLoader==m.LoraLoaderT :
+                    m.lora_set("strength_model",0.75)
+                    m.lora_set("strength_clip" ,0.75)                
+                if m.LoraLoader==m.LoraLoaderR :
+                    m.lora_set("strength_model_min",0.25)
+                    m.lora_set("strength_clip_min" ,0.25)
                 
-                m.lora_set("strength_model_min",0.25)
-                m.lora_set("strength_clip_min" ,0.25)
-            
             if random.choice([True, False]):
                 loradicRandom(m)
             
@@ -228,8 +232,12 @@ while True:
             
             if random.choice([True, False]):
                 nm=m.lora_add("hunged_girl")
-                m.pset(nm,"strength_model_min",0.25)
-                m.pset(nm,"strength_clip_min" ,0.25)
+                if m.LoraLoader==m.LoraLoaderT :
+                    m.pset(nm,"strength_model",0.75)
+                    m.pset(nm,"strength_clip" ,0.75)
+                if m.LoraLoader==m.LoraLoaderR :
+                    m.pset(nm,"strength_model_min",0.25)
+                    m.pset(nm,"strength_clip_min" ,0.25)
                 m.caddin("NSFW_add","__hunged_girl__,")
 
             m.pset("EmptyLatentImage","height",768+64*1)
