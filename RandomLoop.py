@@ -161,6 +161,7 @@ loradic={
     "artistHimitsu_v10" : "Artist_Himitsu, sexy,porn, blush,sweat,saliva, gag, ",
     "artistMeito_v10" : "Artist_Meito, sex,porn, blush,sweat,saliva, orgasm, ahegao, rape, speech bubble, ",
     "fromBelowPOV_v1" : "from_below,  foreshortening ,uncensored,pussy, no panties,",
+    #"conceptStainedSheets_v10" : "stained sheets,",
     #"lrCumInStomach_lrCumInStomachV10" : "deepthroat, fellatio, x-ray, cum in stomach,",
 }
 

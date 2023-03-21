@@ -317,7 +317,7 @@ class PromptClass:
         #--------------------------------
         tmp=""
         if "positive" in c:        
-            r=[c["positive"]]
+            r=[lambda c: c["positive"]]
         else:
             r=[]
             r.append(lambda c: cget(c,"quality",self.quality))
@@ -332,6 +332,8 @@ class PromptClass:
         r.append(lambda c: cget(c,"NSFW_add","")  )
         random.shuffle(r)
         for f in r:
+            print(type(f))
+            print(f)
             tmp+=f(c)
         
         if wildcardsOn:
