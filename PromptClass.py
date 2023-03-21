@@ -15,18 +15,17 @@ https://github.com/lilly1987/ComfyUI_node_Lilly
 wildcardsOn=False
 print(f"PromptClass __name__ {__name__}")
 try:
-    if __name__ == '__main__' :
-        print("nain")
-        from wildcards import wildcards
-    else:
-        print("nain noy")
+    if __name__ == os.path.splitext(os.path.basename(__file__))[0] :
         from wildcards import wildcards 
-   
+    else:
+        from .wildcards import wildcards 
     wildcardsOn=True
     #wildcards.card_path=os.path.dirname(__file__)+"\\..\\wildcards\\**\\*.txt"
     print("import wildcards succ")
 except Exception as e:     
     print(f"import wildcards fail : {e}")
+    err_msg = traceback.format_exc()
+    print(err_msg)
     wildcardsOn=False
     
 #----------------------------

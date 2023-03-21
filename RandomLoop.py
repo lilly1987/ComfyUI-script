@@ -30,7 +30,7 @@ chars={
     "SaegusaMayumi" : {
         "char" : "{mayumi,__breasts__,|__mayumi__},",
         #"dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose,","__SaegusaMayumidress__" ,dress],
-        "dress" : "{__SaegusaMayumidress__|__character_dress__|__dress_my__|}, __acc_my__," ,
+        "dress" : "{__SaegusaMayumidress__|__character_dress__|__dress_my__|}, " ,
         "lora" : ["SaegusaMayumiTheIrregularAt_mayumi"],
     },
     "Tomoyo" : {
