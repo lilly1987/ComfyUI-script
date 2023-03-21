@@ -8,6 +8,7 @@ import time
 from PromptClass import *
 import copy  
 
+#----------------------------
 dress="{__character_dress__|__dress_my__|},__acc_my__,"
 shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
 quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
@@ -19,6 +20,7 @@ acc="{__acc_my__|}"
 char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
 negative="__no2d__"
 positive=quality + char + dress + shoulder + NSFW + acc + focus + pose
+#----------------------------
 
 chars={ 
     "SaegusaMayumi" : {
@@ -141,15 +143,20 @@ chars={
     "my" : {
         "positive" : "__my__",
         #"negative" : "__no2d__",
-        #"strength_model" : [0.5,1.0]
     },
 
 }
 
-myckpts=["AOM3A1-fp16","libmix_v20-fp16"]
+myckpts=[
+    "AOM3A1-fp16",
+    "libmix_v20-fp16",
+    "Balor-V3.1featACT-fp16",
+]
 
 #wildcardsOn=False
 #random.shuffle(ckptnms)
+
+ckptnmsmy=["AnyTwam"]
 
 #======================
 loradic={
@@ -163,10 +170,10 @@ loradic={
     "fromBelowPOV_v1" : "from_below,  foreshortening ,uncensored,pussy, no panties,",
     #"lrCumInStomach_lrCumInStomachV10" : "deepthroat, fellatio, x-ray, cum in stomach,",
 }
-def loradicRandom(m,c):
+def loradicRandom(m):
     loradnm=random.choice(list(loradic.keys()))
     m.lora_add(loradnm)
-    caddin(c,"NSFW_add",loradic[loradnm])
+    m.caddin("NSFW_add",loradic[loradnm])
 #======================
 keys = list(chars.keys())
 ckptcnt=0
@@ -176,16 +183,16 @@ while True:
     for c in keys:
         c=random.choice(["SaegusaMayumi","Tomoyo","diana"])
         for j in range(2):
-            cc=copy.deepcopy(chars[c])
+            #cc=copy.deepcopy(chars[c])
             if ckptcnt ==0 :
-                PromptClass.ckptnm=random.choice(ckptnms)
+                PromptClass.ckptnm=random.choice(random.choice([ckptnms,myckpts]))
                 #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
                 ckptcnt=6
             ckptcnt-=1
-            m=PromptClass()            
+            m=PromptClass(chars[c])            
             #chars[c]["loraList"]=["amazonPositionSexAct_v10"]
             
-            loradicRandom(m,cc)
+            loradicRandom(m)
             
             #if random.choice([True, False]):
             #    m.lora_add(random.choice(loranms))
@@ -194,61 +201,13 @@ while True:
             nm=m.lora_add("hunged_girl")
             m.pset(nm,"strength_model_min",0.75)
             m.pset(nm,"strength_clip_min",0.75)
-            caddin(cc,"NSFW_add","__hunged_girl__")
-            
-                #chars[c]["NSFW"]=chars[c]["NSFW"]+"__hunged_girl__"
+            m.caddin("NSFW_add","__hunged_girl__")
+
             m.pset("EmptyLatentImage","height",768+64*1)
             m.pset("EmptyLatentImage","width",320+64*1)
             
-            m.prompt_set(cc)
+            r=m.promptGet()
             
-            print(m.prompts)
-            queue_prompt(m.prompts,1)
+            print(r)
+            queue_prompt(r,1)
 
-
-#======================
-"""
-for ckptnm in random.sample(ckptnms,min(20,len(ckptnms))):#+myckpts
-#for ckptnm in ckptnms:
-
-    print(f"ckptnm : {ckptnm}")
-    PromptClass.ckptnm=ckptnm
-    #continue
-    
-    
-    #for c  in chars:
-    c="SaegusaMayumi"
-    keys = list(chars.keys())
-    random.shuffle(keys)
-    #for j in range(1):
-    for c in keys:
-        for j in range(4):
-            
-            m=PromptClass()            
-            #chars[c]["loraList"]=["amazonPositionSexAct_v10"]
-
-            #if random.choice([True, False]):
-            #    m.lora_add("femaleMasturbation_v1")
-            #    cadd(chars[c],"NSFW","fingering, schlick, masturbation,")
-            #if random.choice([True, False]):
-            #    m.lora_add("amazonPositionSexAct_v10")
-            #    cadd(chars[c],"NSFW","sex,pussy,")
-            if random.choice([True, False]):
-                m.lora_add(random.choice(loranms))
-            m.prompt_set(chars[c])
-            #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
-            
-            print(m.prompts)
-            queue_prompt(m.prompts)
-    #c="SaegusaMayumi"
-    #for j in range(1):
-    #for c  in chars:
-    #    for j in range(2):
-    #        
-    #        m=myprompt()            
-    #        m.prompt_set(chars[c])
-    #        #m.pset("CheckpointLoaderSimple","ckpt_name",ckptnm)
-    #        print(m.prompts)
-    #        queue_prompt(m.prompts)
-    
-    """

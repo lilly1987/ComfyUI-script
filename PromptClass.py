@@ -2,10 +2,16 @@ import os, glob, sys
 import json
 from urllib import request, parse
 import random
+import copy
 import time
 
-
-
+#----------------------------
+"""
+This script is written under the premise of using my own node.
+https://github.com/lilly1987/ComfyUI_node_Lilly
+"""
+#----------------------------
+# wildcards support check
 wildcardsOn=False
 try:
     import wildcards
@@ -15,28 +21,69 @@ try:
 except:
     print("import wildcards fail")
     wildcardsOn=False
-
-
-ckpts_path=os.path.join(
+    
+#----------------------------
+# F:\WEBUI\ComfyUI_windows_portable\ComfyUI\models\checkpoints\*.safetensors
+ckpts_path=os.path.join( 
+    os.path.dirname(__file__),
+    "..\\..\\models\\checkpoints\\*fp16.safetensors"
+)    
+ckpts=glob.glob(ckpts_path)
+# F:\WEBUI\ComfyUI_windows_portable\ComfyUI\models\checkpoints\artistKidmo_v10.safetensors
+# If want sub folder change to
+"""
+ckpts_path=os.path.join( 
         os.path.dirname(__file__),
         "..\\..\\models\\checkpoints"
-    )+"\\*fp16.safetensors"
-ckpts=glob.glob(ckpts_path)
-ckptnms=[os.path.basename(ckpt) for ckpt in ckpts]
+    )+"\\**\\*fp16.safetensors"
+ckpts=glob.glob(ckpts_path,recursive=True)
+"""
+ckptnms=[os.path.basename(ckpt) for ckpt in ckpts] # file name list
+ckptnm=random.choice(ckptnms)
 print(f"ckpts cnt : {len(ckptnms)}")
 print(f"ckpts dat : {ckptnms[0]}")
 if len(ckptnms) ==0 :
     print(f"!!!!!!!!!! ckpts cnt 0 !!!!!!!!!!!!!")
-    
+    quit()
+#----------------------------
+loras_path=os.path.join(
+    os.path.dirname(__file__),
+    "..\\..\\models\\loras\\*.safetensors"
+)
+loras=glob.glob(loras_path)
+"""
 loras_path=os.path.join(
         os.path.dirname(__file__),
         "..\\..\\models\\loras"
-    )+"\\*.safetensors"
-loras=glob.glob(loras_path)
+    )+"\\**\\*.safetensors"
+loras=glob.glob(loras_path,recursive=True)
+"""
 loranms=[os.path.basename(lora) for lora in loras]
+loranm=random.choice(loranms)
+
+print(f"loras cnt : {len(loranms)}")
+print(f"loras dat : {loranms[0]}")
+#----------------------------
+vaes_path=os.path.join(
+    os.path.dirname(__file__),
+    "..\\..\\models\\VAE\\*.safetensors"
+)
+vaes=glob.glob(vaes_path)
+"""
+vaes_path=os.path.join(
+        os.path.dirname(__file__),
+        "..\\..\\models\\VAE\\**\\*.safetensors"
+    )
+vaes=glob.glob(vaes_path,recursive=True)
+"""
+vae_names=[os.path.basename(vae) for vae in vaes]
+vae_name=random.choice(vae_names)
+
 print(f"loras cnt : {len(loranms)}")
 print(f"loras dat : {loranms[0]}")
 
+#----------------------------
+# global static
 shoulder="off shoulder, bare shoulders, Strapless,"
 quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
 dress="dress,"
@@ -48,6 +95,8 @@ focus=""
 pose=""
 positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus
 
+
+#----------------------------
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
@@ -73,6 +122,9 @@ def cget(c,v,t):
     p=c[v] if v in c else t
     return lget(p)
     
+#----------------------------
+# sand to api
+# max : wait max queue
 def queue_prompt(prompt, max=1):
     
     while True:
@@ -96,11 +148,72 @@ def queue_prompt(prompt, max=1):
     print(f"send" )
     time.sleep(2)
 
+#----------------------------
+"""
+        - hou to use
+            PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
+            m=PromptClass(
+                {
+                    "positive" : "__my__",
+                    #"negative" : "__no2d__",
+                    "lora" : "IrisPokemon_v10"
+                }
+            )  
+            nm=m.lora_add("hunged_girl")
+            m.pset(nm,"strength_model_min",0.75)
+            m.pset(nm,"strength_clip_min",0.75)
+            m.caddin("NSFW_add","__hunged_girl__")
+            r=m.promptGet()
+            print(r)
+            queue_prompt(r,2)
+-----------------------------------------------
+    - ckptnm : static ckpt file name
+        - self.c=copy.deepcopy(chars[c])
+        
+            node change value
+            dict
+            {
+                key : value,
+                key : value
+                ...
+            }
+            
+            - support key
+            
+                positive
+                negative
+                ckptnm
+                lora
+                
+            - if not use key positive
+                - self.quality=quality
+                - self.dress=dress
+                - self.NSFW=NSFW
+                - self.char=char
+                - self.acc=acc
+                - self.focus=focus
+                - self.pose=pose
+                - self.shoulder=shoulder
+                
+            - if not use key negative then use global negative
+            
+            
+            
+        - self.prompts={}
+            for sand to api 
+            
+        - self.names={}
+            { node name : node no }
+            not edit self.names
+            need use self.padd(node name,node type, {inputs} )
+            No duplication node name 
 
+"""
 class PromptClass:
 
     ckptnm="weriDiffusion_v10-fp16.safetensors"
 
+    #----------------------------
     def pget(self,name,input):        
         #print(self.prompts[self.names[name]]["inputs"])
         return self.prompts[self.names[name]]["inputs"][input]
@@ -128,7 +241,7 @@ class PromptClass:
         print(f"padd : {name}" )
         print(f"padd : {self.names}" )
         
-        
+    #----------------------------
     def lora_add(self, name):
         print(f"lora_add : {name}")
         n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
@@ -157,26 +270,34 @@ class PromptClass:
         self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
         self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
         
+    #----------------------------
+    def caddin(self,v,t):
+        caddin(self.c,v,t)
 
-    def prompt_set(self,c):
+    #----------------------------
+    def promptGet(self,c=None):
         #print(f"dict : {c}" )
         #print(type(c))
+        if not c:
+            c=self.c
         if not type(c) is dict:
             print("prompt_set error. not dict")
-            return False
+            return None
         tmp=""
         
         #--------------------------------
         if "positive" in c:
             tmp=c["positive"]
         else:
-            tmp+=cget(c,"quality",self.quality)
+            tmp=""
             r=[]
-            r.append(lambda c: cget(c,"prompt",self.char))
+            r.append(lambda c: cget(c,"quality",self.quality))
+            r.append(lambda c: cget(c,"char",self.char))
             r.append(lambda c: cget(c,"dress",self.dress))
+            r.append(lambda c: cget(c,"shoulder",self.shoulder))
+            r.append(lambda c: cget(c,"acc",self.acc)  )
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
             r.append(lambda c: cget(c,"NSFW_add","")  )
-            r.append(lambda c: cget(c,"acc",self.acc)  )
             r.append(lambda c: cget(c,"focus",self.focus)  )
             r.append(lambda c: cget(c,"pose",self.pose)  )
             random.shuffle(r)
@@ -198,6 +319,12 @@ class PromptClass:
         if wildcardsOn:
             tmp=wildcards.run(tmp)
         self.pset("CLIPTextEncodeN","text", tmp)
+        #--------------------------------
+        if "ckptnm" in c:
+            self.pset("CheckpointLoaderSimple","ckpt_name", c["ckptnm"])
+        #--------------------------------
+        if "vae_name" in c:
+            self.pset("VAELoader","vae_name", c["vae_name"])
         #--------------------------------
         if "lora" in c: 
             self.lora_add(lget(c["lora"]))        
@@ -221,12 +348,12 @@ class PromptClass:
         #        self.pget("CheckpointLoaderSimple","ckpt_name")
         #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
         #)
-        
+        return self.prompts
 
     #print(f"ckpts {ckptnms}")
-    def __init__(self):
+    def __init__(self,c):
         #print(f"__init__ ")
-        
+        self.c=copy.deepcopy(c)
         self.prompts={}
         self.names={}
         self.shoulder=shoulder
@@ -237,12 +364,14 @@ class PromptClass:
         self.acc=acc
         self.focus=focus
         self.pose=pose
+        self.ckptnm=ckptnm
+        self.vae_name=vae_name
        
         self.padd(
             "CheckpointLoaderSimple",
             "CheckpointLoaderSimpleText",
             {
-                "ckpt_name": PromptClass.ckptnm
+                "ckpt_name": ckptnm
             }
             # model
             # clip
@@ -337,7 +466,7 @@ class PromptClass:
             "VAELoader",
             "VAELoader",
             {
-                "vae_name": "BerrysMix.vae.safetensors"
+                "vae_name": vae_name
             }
         )
 
