@@ -359,13 +359,13 @@ class PromptClass:
         r.append(lambda c: cget(c,"NSFW_add","")  )
         random.shuffle(r)
         for f in r:
-            print(type(f))
+            #print(type(f))
             #print(f)
             if type(f) is types.FunctionType:
                 t=f(c)
             else:
                 t=f
-            print(t)
+            #print(t)
             tmp+=t
         
         if wildcardsOn:
