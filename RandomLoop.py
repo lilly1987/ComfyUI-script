@@ -5,21 +5,25 @@ import random
 import time
 #from LinkedList import LinkedList 
 import time
-from PromptClass import *
 import copy  
 
+print(f"RandomLoop __name__ {__name__}")
+print(f"RandomLoop __file__ {os.path.splitext(os.path.basename(__file__))[0]}")
+
+from PromptClass import *
+import mypath  
 #----------------------------
-dress="{__character_dress__|__dress_my__|},__acc_my__,"
-shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
-quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
-dress="{__character_dress__|__dress_my__|},__acc_my__,"
-NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,"
-pose="{standing,|}"
-focus="{full body,|}"
-acc="{__acc_my__|}"
-char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
-negative="__no2d__"
-positive=quality + char + dress + shoulder + NSFW + acc + focus + pose
+PromptClass.dress="{__character_dress__|__dress_my__|},__acc_my__,"
+PromptClass.shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
+PromptClass.quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
+PromptClass.dress="{__character_dress__|__dress_my__|},__acc_my__,"
+PromptClass.NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,"
+PromptClass.pose="{standing,|}"
+PromptClass.focus="{full body,|}"
+PromptClass.acc="{__acc_my__|}"
+PromptClass.char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __breasts__,"
+PromptClass.negative="__no2d__"
+PromptClass.positive=PromptClass.quality + PromptClass.char + PromptClass.dress + PromptClass.shoulder + PromptClass.NSFW + PromptClass.acc + PromptClass.focus + PromptClass.pose
 #----------------------------
 
 chars={ 
@@ -202,9 +206,9 @@ while True:
             
             if random.choice([True, False]):
                 nm=m.lora_add("hunged_girl")
-                m.pset(nm,"strength_model_min",0.75)
-                m.pset(nm,"strength_clip_min",0.75)
-                m.caddin("NSFW_add","__hunged_girl__")
+                #m.pset(nm,"strength_model_min",0.75)
+                #m.pset(nm,"strength_clip_min",0.75)
+                m.caddin("NSFW_add","__hunged_girl__,")
 
             m.pset("EmptyLatentImage","height",768+64*1)
             m.pset("EmptyLatentImage","width",320+64*1)

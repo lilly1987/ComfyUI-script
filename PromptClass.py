@@ -13,13 +13,20 @@ https://github.com/lilly1987/ComfyUI_node_Lilly
 #----------------------------
 # wildcards support check
 wildcardsOn=False
+print(f"PromptClass __name__ {__name__}")
 try:
-    import wildcards
+    if __name__ == '__main__' :
+        print("nain")
+        from wildcards import wildcards
+    else:
+        print("nain noy")
+        from wildcards import wildcards 
+   
     wildcardsOn=True
     #wildcards.card_path=os.path.dirname(__file__)+"\\..\\wildcards\\**\\*.txt"
     print("import wildcards succ")
-except:
-    print("import wildcards fail")
+except Exception as e:     
+    print(f"import wildcards fail : {e}")
     wildcardsOn=False
     
 #----------------------------
@@ -39,9 +46,9 @@ ckpts_path=os.path.join(
 ckpts=glob.glob(ckpts_path,recursive=True)
 """
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts] # file name list
-ckptnm=random.choice(ckptnms)
 print(f"ckpts cnt : {len(ckptnms)}")
 print(f"ckpts dat : {ckptnms[0]}")
+ckptnm=random.choice(ckptnms)
 if len(ckptnms) ==0 :
     print(f"!!!!!!!!!! ckpts cnt 0 !!!!!!!!!!!!!")
     quit()
@@ -84,16 +91,7 @@ print(f"loras dat : {loranms[0]}")
 
 #----------------------------
 # global static
-shoulder="off shoulder, bare shoulders, Strapless,"
-quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
-dress="dress,"
-acc="{acc,|}"
-NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
-char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
-negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
-focus=""
-pose=""
-positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus
+
 
 
 #----------------------------
@@ -214,16 +212,29 @@ def queue_prompt(prompt, max=1):
 class PromptClass:
 
     ckptnm="weriDiffusion_v10-fp16.safetensors"
+    vae_name="Anything-V3.0.vae.safetensors"
 
+    #----------------------------
+    shoulder="off shoulder, bare shoulders, Strapless,"
+    quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
+    dress="dress,"
+    acc="{acc,|}"
+    NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
+    char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
+    negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
+    focus=""
+    pose=""
+    positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus
+    
     #----------------------------
     def pget(self,name,input):        
         #print(self.prompts[self.names[name]]["inputs"])
         return self.prompts[self.names[name]]["inputs"][input]
         
     def pset(self,name,input,value):
-        print(f"pset : {name}")
-        print(f"pset : {self.names[name]}")
-        print(f"pset : {self.prompts[self.names[name]]['inputs']}")
+        #print(f"pset : {name}")
+        #print(f"pset : {self.names[name]}")
+        #print(f"pset : {self.prompts[self.names[name]]['inputs']}")
         if not type(self.prompts[self.names[name]]["inputs"][input]) is list :
             while type(value) is list:
                 value=lget(value)
@@ -241,12 +252,12 @@ class PromptClass:
             "class_type":class_type,
             "inputs":inputs
         }
-        print(f"padd : {name}" )
-        print(f"padd : {self.names}" )
+        #print(f"padd : {name}" )
+        #print(f"padd : {self.names}" )
         
     #----------------------------
     def lora_add(self, name):
-        print(f"lora_add : {name}")
+        #print(f"lora_add : {name}")
         n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
         self.padd(
             n,
@@ -351,24 +362,26 @@ class PromptClass:
         #        self.pget("CheckpointLoaderSimple","ckpt_name")
         #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
         #)
+        print(self.prompts)
         return self.prompts
 
     #print(f"ckpts {ckptnms}")
     def __init__(self,c):
         #print(f"__init__ ")
+        global ckptnm
         self.c=copy.deepcopy(c)
         self.prompts={}
         self.names={}
-        self.shoulder=shoulder
-        self.quality=quality
-        self.dress=dress
-        self.NSFW=NSFW
-        self.char=char
-        self.acc=acc
-        self.focus=focus
-        self.pose=pose
-        self.ckptnm=ckptnm
-        self.vae_name=vae_name
+        self.shoulder=PromptClass.shoulder
+        self.quality=PromptClass.quality
+        self.dress=PromptClass.dress
+        self.NSFW=PromptClass.NSFW
+        self.char=PromptClass.char
+        self.acc=PromptClass.acc
+        self.focus=PromptClass.focus
+        self.pose=PromptClass.pose
+        self.ckptnm=PromptClass.ckptnm
+        self.vae_name=PromptClass.vae_name
        
         self.padd(
             "CheckpointLoaderSimple",
@@ -421,7 +434,7 @@ class PromptClass:
             "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.loraClipLast,1],
-                "text": positive
+                "text": PromptClass.positive
             }
         )
 
@@ -431,7 +444,7 @@ class PromptClass:
             "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.loraClipLast,1],
-                "text": negative
+                "text": PromptClass.negative
             }
         )
 
@@ -486,12 +499,13 @@ class PromptClass:
         self.padd(
             
             "SaveImage",
-            "SaveImage",
+            "SaveImageSimple",
             {
                 "images": [self.names["VAEDecode"],0],
                 "filename_prefix": os.path.splitext(
                     self.pget("CheckpointLoaderSimple","ckpt_name")
-                )[0]+"-"+str(random.randint(0, 0xffffffffffffffff )),
+                )[0]
+                #+"-"+str(random.randint(0, 0xffffffffffffffff )),
             }
         )
         #print( f"self.prompts {self.prompts}")
