@@ -183,7 +183,9 @@ def queue_prompt(prompt, max=1):
                 positive
                 negative
                 ckptnm
+                vae_name
                 lora
+                loraList
                 
             - if not use key positive
                 - self.quality=quality
@@ -222,10 +224,11 @@ class PromptClass:
         print(f"pset : {name}")
         print(f"pset : {self.names[name]}")
         print(f"pset : {self.prompts[self.names[name]]['inputs']}")
-        if type(self.prompts[self.names[name]]["inputs"][input]) is list :
-            self.prompts[self.names[name]]["inputs"][input] = value
-        else:
-            self.prompts[self.names[name]]["inputs"][input] = lget(value)
+        if not type(self.prompts[self.names[name]]["inputs"][input]) is list :
+            while type(value) is list:
+                value=lget(value)
+                
+        self.prompts[self.names[name]]["inputs"][input] = value
 
     def psetd(self,name,kv):
         for k, v in kv.items():

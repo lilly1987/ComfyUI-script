@@ -147,18 +147,7 @@ chars={
 
 }
 
-myckpts=[
-    "AOM3A1-fp16",
-    "libmix_v20-fp16",
-    "Balor-V3.1featACT-fp16",
-]
-
-#wildcardsOn=False
-#random.shuffle(ckptnms)
-
-ckptnmsmy=["AnyTwam"]
-
-#======================
+#----------------------
 loradic={
     "femaleMasturbationBoob_v1" : "masturbation, fingering, female_masturbation, grabbing_own_breast,",
     "femaleMasturbation_v1" : "fingering, schlick, masturbation,",
@@ -170,6 +159,15 @@ loradic={
     "fromBelowPOV_v1" : "from_below,  foreshortening ,uncensored,pussy, no panties,",
     #"lrCumInStomach_lrCumInStomachV10" : "deepthroat, fellatio, x-ray, cum in stomach,",
 }
+
+#----------------------
+ckptnmsmy=[
+    "AOM3A1-fp16",
+    "libmix_v20-fp16",
+    "Balor-V3.1featACT-fp16",
+    "AnyTwam-pruned-fp16"
+]
+#----------------------
 def loradicRandom(m):
     loradnm=random.choice(list(loradic.keys()))
     m.lora_add(loradnm)
@@ -181,27 +179,32 @@ while True:
     
     random.shuffle(keys)
     for c in keys:
-        c=random.choice(["SaegusaMayumi","Tomoyo","diana"])
+        c=random.choice(
+            random.choice(
+                [
+                    ["SaegusaMayumi","Tomoyo","diana"],
+                    list(chars.keys())
+                ]
+            )
+        )
         for j in range(2):
-            #cc=copy.deepcopy(chars[c])
             if ckptcnt ==0 :
-                PromptClass.ckptnm=random.choice(random.choice([ckptnms,myckpts]))
+                PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
                 #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
                 ckptcnt=6
             ckptcnt-=1
             m=PromptClass(chars[c])            
-            #chars[c]["loraList"]=["amazonPositionSexAct_v10"]
             
             loradicRandom(m)
             
-            #if random.choice([True, False]):
-            #    m.lora_add(random.choice(loranms))
+            if random.choice([True, False]):
+                m.lora_add(random.choice(loranms))
             
-            #if random.choice([True, False]):
-            nm=m.lora_add("hunged_girl")
-            m.pset(nm,"strength_model_min",0.75)
-            m.pset(nm,"strength_clip_min",0.75)
-            m.caddin("NSFW_add","__hunged_girl__")
+            if random.choice([True, False]):
+                nm=m.lora_add("hunged_girl")
+                m.pset(nm,"strength_model_min",0.75)
+                m.pset(nm,"strength_clip_min",0.75)
+                m.caddin("NSFW_add","__hunged_girl__")
 
             m.pset("EmptyLatentImage","height",768+64*1)
             m.pset("EmptyLatentImage","width",320+64*1)
