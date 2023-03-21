@@ -31,7 +31,7 @@ chars={
         "char" : "{mayumi,__breasts__,|__mayumi__},",
         #"dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose,","__SaegusaMayumidress__" ,dress],
         "dress" : "{__SaegusaMayumidress__|__character_dress__|__dress_my__|}, " ,
-        "lora" : ["SaegusaMayumiTheIrregularAt_mayumi"],
+        "lora" : "SaegusaMayumiTheIrregularAt_mayumi",
     },
     "Tomoyo" : {
         "char" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
@@ -166,10 +166,14 @@ loradic={
 
 #----------------------
 ckptnmsmy=[
+    "AOM3-fp16",
     "AOM3A1-fp16",
-    "libmix_v20-fp16",
-    "Balor-V3.1featACT-fp16",
+    "AOM3A1B-fp16",
     "AnyTwam-pruned-fp16"
+    "Balor-V3.1featACT-fp16",
+    "dreamboxMix-A-fp16-fp16",
+    "libmix_v20-fp16",
+    "whitespace_Quasar-fp16",
 ]
 #----------------------
 def loradicRandom(m):
@@ -191,30 +195,47 @@ while True:
                 ]
             )
         )
+        c="Tomoyo"
+        cc=chars[c]
         for j in range(2):
             if ckptcnt ==0 :
                 PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
                 #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
                 ckptcnt=6
             ckptcnt-=1
-            m=PromptClass(chars[c])            
+            if random.choice([True, False]):
+                cc["positive"]="__quality1__,__mayumi__,__dress1__,__hunged_girl1__,__NSFW1__,"
             
-            loradicRandom(m)
+            m=PromptClass(cc)            
+            r=m.promptSet()
+            print(r)
+            
+            if "lora" in cc:
+                print(f"")
+                print(f"chars[c]['lora'] : {cc['lora']}")
+                print(f"chars[c]['lora'] : {type(cc['lora'])}")
+                print(f"loratag : {m.loratag}")
+                
+                m.lora_set("strength_model_min",0.25)
+                m.lora_set("strength_clip_min" ,0.25)
+            
+            if random.choice([True, False]):
+                loradicRandom(m)
             
             if random.choice([True, False]):
                 m.lora_add(random.choice(loranms))
             
             if random.choice([True, False]):
                 nm=m.lora_add("hunged_girl")
-                #m.pset(nm,"strength_model_min",0.75)
-                #m.pset(nm,"strength_clip_min",0.75)
+                m.pset(nm,"strength_model_min",0.25)
+                m.pset(nm,"strength_clip_min" ,0.25)
                 m.caddin("NSFW_add","__hunged_girl__,")
 
             m.pset("EmptyLatentImage","height",768+64*1)
             m.pset("EmptyLatentImage","width",320+64*1)
             
-            r=m.promptGet()
             
+            r=m.promptGet()
             print(r)
             queue_prompt(r,1)
 

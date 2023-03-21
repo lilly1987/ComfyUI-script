@@ -266,9 +266,9 @@ class PromptClass:
                 "clip"  : [self.loraClipLast ,1],
                 "lora_name": name,
                 "seed": random.randint(0, 0xffffffffffffffff ),
-                "strength_model_min": 0.50,
+                "strength_model_min": 0.0,
                 "strength_model_max": 1.0,
-                "strength_clip_min": 0.50,
+                "strength_clip_min": 0.0,
                 "strength_clip_max": 1.0
             }
         )
@@ -276,19 +276,35 @@ class PromptClass:
         self.loraModelLast=self.names[n]
         self.loraClipLast =self.names[n]
         self.lora_add_after()
+        if n in self.loratag:
+            self.loratag[name]+=[n]
+        else:
+            self.loratag[name]=[n]
+        print(f"loratag[{name}] : {self.loratag[name]}")
         return n
         
     def lora_add_after(self):
         self.pset("KSampler"        , "model", [self.loraModelLast,0])
         self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
         self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
-        
+
+    def lora_set(self,key,value,index=0):
+        if type(self.c['lora']) is list:
+            for l in self.c['lora']:
+                if l in self.loratag:
+                    self.pset(self.loratag[l][index],key,value)
+        else:
+            self.pset(self.loratag[self.c['lora']][index],key,value)
+
     #----------------------------
     def caddin(self,v,t):
         caddin(self.c,v,t)
 
     #----------------------------
-    def promptGet(self,c=None):
+    def promptGet(self):
+        return self.prompts
+        
+    def promptSet(self,c=None):
         #print(f"dict : {c}" )
         #print(type(c))
         if not c:
@@ -299,10 +315,10 @@ class PromptClass:
         tmp=""
         
         #--------------------------------
-        if "positive" in c:
-            tmp=c["positive"]
+        tmp=""
+        if "positive" in c:        
+            r=[c["positive"]]
         else:
-            tmp=""
             r=[]
             r.append(lambda c: cget(c,"quality",self.quality))
             r.append(lambda c: cget(c,"char",self.char))
@@ -310,12 +326,13 @@ class PromptClass:
             r.append(lambda c: cget(c,"shoulder",self.shoulder))
             r.append(lambda c: cget(c,"acc",self.acc)  )
             r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
-            r.append(lambda c: cget(c,"NSFW_add","")  )
             r.append(lambda c: cget(c,"focus",self.focus)  )
             r.append(lambda c: cget(c,"pose",self.pose)  )
-            random.shuffle(r)
-            for f in r:
-                tmp+=f(c)
+        
+        r.append(lambda c: cget(c,"NSFW_add","")  )
+        random.shuffle(r)
+        for f in r:
+            tmp+=f(c)
         
         if wildcardsOn:
             tmp=wildcards.run(tmp)
@@ -381,7 +398,8 @@ class PromptClass:
         self.pose=PromptClass.pose
         self.ckptnm=PromptClass.ckptnm
         self.vae_name=PromptClass.vae_name
-       
+        self.loratag={}
+        
         self.padd(
             "CheckpointLoaderSimple",
             "CheckpointLoaderSimpleText",
@@ -507,6 +525,8 @@ class PromptClass:
                 #+"-"+str(random.randint(0, 0xffffffffffffffff )),
             }
         )
+        
+        #promptSet(c)
         #print( f"self.prompts {self.prompts}")
         #print( f"self.names {self.names}")
     #print(names)
