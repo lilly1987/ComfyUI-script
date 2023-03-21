@@ -144,6 +144,36 @@ chars={
         #"negative" : "__no3d__",
         "lora" : "IrisPokemon_v10"
     },
+    "shalltearBloodfallen_v10" : {
+        "char" : "shalltear, shalltearcostume, ponytail, ",
+        #"negative" : "__no3d__",
+        "lora" : "shalltearBloodfallen_v10"
+    },
+    "blackarona_v10" : {
+        "char" : "arona, white hair, ",
+        #"negative" : "__no3d__",
+        "lora" : "blackarona_v10"
+    },
+    "gloriousAzurLaneSpring_GloriousSpiring" : {
+        "char" : "blonde hair,",
+        #"negative" : "__no3d__",
+        "lora" : "gloriousAzurLaneSpring_GloriousSpiring"
+    },
+    "kidmoStyle_v1" : {
+        #"char" : "blonde hair,",
+        #"negative" : "__no3d__",
+        "lora" : "kidmoStyle_v1"
+    },
+    "fuyusakaIori13SentinelsAegisRim_fuyusakaIoriSoftV10" : {
+        "char" : "fuyusaka iori, fuyusaka iori 1, long hair, grey hair,",
+        #"negative" : "__no3d__",
+        "lora" : "fuyusakaIori13SentinelsAegisRim_fuyusakaIoriSoftV10"
+    },
+    "9a91GirlsFrontline_v10" : {
+        "char" : "BREAK 9a91maid, ",
+        #"negative" : "__no3d__",
+        "lora" : "9a91GirlsFrontline_v10"
+    },
     "my" : {
         "positive" : "__my__",
         #"negative" : "__no2d__",
@@ -182,6 +212,10 @@ ckptnmsmy=[
     "dualPersonality_dualdalcenull-fp16",
     "libmix_v20-fp16",
     "whitespace_Quasar-fp16",
+    "RememberMix-pruned-fp16",
+    "RDtMix-fp16",
+    "vividicimix_-fp16",
+    "VIC-BACLA-MIX-V1-fp16",
 ]
 #----------------------
 def loradicRandom(m):
@@ -189,12 +223,13 @@ def loradicRandom(m):
     m.lora_add(loradnm)
     m.caddin("NSFW_add",loradic[loradnm])
 #======================
-keys = list(chars.keys())+["SaegusaMayumi","Tomoyo","diana"]
+keys = [list(chars.keys()),["SaegusaMayumi","Tomoyo","diana","primKuroinu_10"]]
 ckptcnt=0
 while True:
     
-    random.shuffle(keys)
-    for c in keys:
+    #random.shuffle(keys)
+    c=random.choice(random.choice(keys))
+    #for c in keys:
         #c=random.choice(
         #    random.choice(
         #        [
@@ -203,76 +238,83 @@ while True:
         #        ]
         #    )
         #)
-        #c="Tomoyo"
-        cc=chars[c]
-        for j in range(2):
-            if ckptcnt ==0 :
-                PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
-                #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
-                ckptcnt=6
-            ckptcnt-=1
-            if random.choice([True, False]):
-                cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
-                if "char" in cc:
-                    cc["positive"]+=[cc["char"]]
+    #c="Tomoyo"
+    cc=chars[c]
+    for j in range(2):
+        if ckptcnt <=0 :
+            print(f"ckptnms,ckptnmsmy : {len(ckptnms)},{len(ckptnmsmy)}")
+            PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
+            #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
+            print(f"PromptClass.ckptnm : {PromptClass.ckptnm}")
+            ckptcnt=6
+        ckptcnt-=1
+        print(f"{ckptcnt}")
+        if random.choice([True, False]):
+            cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
+            if "char" in cc:
+                cc["positive"]+=[cc["char"]]
+        
+        m=PromptClass(cc)            
+        r=m.promptSet()
+        print(r)
+        
+        if "lora" in cc:
+            print(f"")
+            print(f"chars[c]['lora'] : {cc['lora']}")
+            print(f"chars[c]['lora'] : {type(cc['lora'])}")
+            print(f"loratag : {m.loratag}")
+            if m.LoraLoader==m.LoraLoaderT :
+                m.lora_set("strength_model",random.uniform(1/8*5,1.0))
+                m.lora_set("strength_clip" ,random.uniform(1/8*12,1.0))                
+            if m.LoraLoader==m.LoraLoaderR :
+                m.lora_set("strength_model_min",random.uniform(1/8*5,1.0))
+                m.lora_set("strength_clip_min" ,random.uniform(1/8*12,1.0))
             
-            m=PromptClass(cc)            
-            r=m.promptSet()
-            print(r)
+        if random.choice([True, False]):
+            loradicRandom(m)
+        
+        if random.choice([True, False]):
+            m.lora_add(random.choice(loranms))
             
-            if "lora" in cc:
-                print(f"")
-                print(f"chars[c]['lora'] : {cc['lora']}")
-                print(f"chars[c]['lora'] : {type(cc['lora'])}")
-                print(f"loratag : {m.loratag}")
-                if m.LoraLoader==m.LoraLoaderT :
-                    m.lora_set("strength_model",random.uniform(1/8*5,1.0))
-                    m.lora_set("strength_clip" ,random.uniform(1/8*5,1.0))                
-                if m.LoraLoader==m.LoraLoaderR :
-                    m.lora_set("strength_model_min",random.uniform(1/8*5,1.0))
-                    m.lora_set("strength_clip_min" ,random.uniform(1/8*5,1.0))
-                
-            if random.choice([True, False]):
-                loradicRandom(m)
+        if random.choice([True, False]):
+        #if True:
+            nm=m.lora_add("breastsOutExposed_24")
+            if m.LoraLoader==m.LoraLoaderT :
+                m.pset(nm,"strength_model",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip" ,random.uniform(1.25,1.0))
+            if m.LoraLoader==m.LoraLoaderR :
+                m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip_min" ,random.uniform(1.25,1.0))
+            m.caddin("NSFW_add",loradic["breastsOutExposed_24"])
             
-            if random.choice([True, False]):
-                m.lora_add(random.choice(loranms))
-                
-            if random.choice([True, False]):
-                nm=m.lora_add("breastsOutExposed_24")
-                if m.LoraLoader==m.LoraLoaderT :
-                    m.pset(nm,"strength_model",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip" ,random.uniform(0.5,1.0))
-                if m.LoraLoader==m.LoraLoaderR :
-                    m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip_min" ,random.uniform(0.5,1.0))
-                m.caddin("NSFW_add",loradic["breastsOutExposed_24"])
-                
-            if random.choice([True, False]):
-                nm=m.lora_add("conceptCowgirl_v10")
-                if m.LoraLoader==m.LoraLoaderT :
-                    m.pset(nm,"strength_model",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip" ,random.uniform(0.5,1.0))
-                if m.LoraLoader==m.LoraLoaderR :
-                    m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip_min" ,random.uniform(0.5,1.0))
-                m.caddin("NSFW_add","__Cowgirl1__,")
-            
-            if random.choice([True, False]):
-                nm=m.lora_add("hunged_girl")
-                if m.LoraLoader==m.LoraLoaderT :
-                    m.pset(nm,"strength_model",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip" ,random.uniform(0.5,1.0))
-                if m.LoraLoader==m.LoraLoaderR :
-                    m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
-                    m.pset(nm,"strength_clip_min" ,random.uniform(0.5,1.0))
-                m.caddin("NSFW_add","__hunged_girl1__,")
+        if random.choice([True, False]):
+        #if True:
+            nm=m.lora_add("conceptCowgirl_v10")
+            if m.LoraLoader==m.LoraLoaderT :
+                m.pset(nm,"strength_model",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip" ,random.uniform(1.25,1.0))
+            if m.LoraLoader==m.LoraLoaderR :
+                m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip_min" ,random.uniform(1.25,1.0))
+            m.caddin("NSFW_add","__Cowgirl1__,")
+        
+        if random.choice([True, False]):
+        #if True:
+            nm=m.lora_add("hunged_girl")
+            if m.LoraLoader==m.LoraLoaderT :
+                m.pset(nm,"strength_model",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip" ,random.uniform(1.25,1.0))
+            if m.LoraLoader==m.LoraLoaderR :
+                m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
+                m.pset(nm,"strength_clip_min" ,random.uniform(1.25,1.0))
+            m.caddin("NSFW_add","__hunged_girl1__,")
 
-            m.pset("EmptyLatentImage","height",768+64*1)
-            m.pset("EmptyLatentImage","width",320+64*1)
-            
-            
-            r=m.promptGet()
-            print(r)
-            queue_prompt(r,1)
+        m.pset("EmptyLatentImage","height",768+64*1)
+        m.pset("EmptyLatentImage","width",320+64*1)
+        
+        
+        r=m.promptSet()
+        r=m.promptGet()
+        print(r)
+        queue_prompt(r,1)
 

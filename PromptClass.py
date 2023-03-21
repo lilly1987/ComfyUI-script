@@ -105,13 +105,14 @@ def cadd(c,v,t):
 def caddin(c,v,t):
     
     if v in c:
-        #print(f"c[v] : {c[v]}")
+        #print(f"t c[v] : {c[v]}")
         if t in c[v]:
+            #print(f"r c[v]")
             return
-        c[v]+=c[v]+t
+        c[v]+=t
     else:
         #print(f"c : {c}")
-        #print(f"c[v] : {c[v]}")
+        #print(f"e c    : {c}")
         c[v]=t
         return c[v]
     
@@ -319,13 +320,19 @@ class PromptClass:
 
     #----------------------------
     def caddin(self,v,t):
+        #print(f"---" )
+        #print(f"caddin : {t}" )
+        #print(f"self.c : {self.c}" )
         caddin(self.c,v,t)
+        #print(f"self.c : {self.c}" )
+        #print(f"---" )
 
     #----------------------------
     def promptGet(self):
         return self.prompts
         
     def promptSet(self,c=None):
+        
         #print(f"dict : {c}" )
         #print(type(c))
         if not c:
@@ -333,6 +340,8 @@ class PromptClass:
         if not type(c) is dict:
             print("prompt_set error. not dict")
             return None
+            
+        print(f"promptSet : {c}" )
         tmp=""
         
         #--------------------------------
@@ -357,6 +366,8 @@ class PromptClass:
             r.append(lambda c: cget(c,"body",self.body)  )
         
         r.append(lambda c: cget(c,"NSFW_add","")  )
+        
+        #print(f"NSFW_add : "+cget(c,"NSFW_add",""))
         random.shuffle(r)
         for f in r:
             #print(type(f))
@@ -367,9 +378,10 @@ class PromptClass:
                 t=f
             #print(t)
             tmp+=t
-        
+        #print(f"positive : {tmp}")
         if wildcardsOn:
             tmp=wildcards.run(tmp)
+        #print(f"positive : {tmp}")
         self.pset("CLIPTextEncodeP","text", tmp)
         #--------------------------------
         if "negative" in c:
@@ -412,7 +424,9 @@ class PromptClass:
         #        self.pget("CheckpointLoaderSimple","ckpt_name")
         #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
         #)
+        print("====")
         print(self.prompts)
+        print("====")
         return self.prompts
 
     #print(f"ckpts {ckptnms}")
