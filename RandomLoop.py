@@ -238,38 +238,42 @@ while True:
         #        ]
         #    )
         #)
-    #c="Tomoyo"
+    c="Tomoyo"
     cc=chars[c]
     for j in range(2):
         if ckptcnt <=0 :
-            print(f"ckptnms,ckptnmsmy : {len(ckptnms)},{len(ckptnmsmy)}")
             PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
             #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
+            print()
+            print(f"ckptnms,ckptnmsmy : {len(ckptnms)},{len(ckptnmsmy)}")
             print(f"PromptClass.ckptnm : {PromptClass.ckptnm}")
             ckptcnt=6
         ckptcnt-=1
-        print(f"{ckptcnt}")
+        print()
+        print(f"ckptcnt {ckptcnt}")
         if random.choice([True, False]):
             cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
             if "char" in cc:
                 cc["positive"]+=[cc["char"]]
         
         m=PromptClass(cc)            
-        r=m.promptSet()
-        print(r)
+        #r=m.promptSet()
+        #print(f"promptSet : {r}")
         
         if "lora" in cc:
-            print(f"")
-            print(f"chars[c]['lora'] : {cc['lora']}")
-            print(f"chars[c]['lora'] : {type(cc['lora'])}")
-            print(f"loratag : {m.loratag}")
+            #print(f"")
+            #print(f"chars[c]['lora'] : {cc['lora']}")
+            #print(f"chars[c]['lora'] : {type(cc['lora'])}")
+            #print(f"loratag : {m.loratag}")
             if m.LoraLoader==m.LoraLoaderT :
                 m.lora_set("strength_model",random.uniform(1/8*5,1.0))
                 m.lora_set("strength_clip" ,random.uniform(1/8*12,1.0))                
             if m.LoraLoader==m.LoraLoaderR :
                 m.lora_set("strength_model_min",random.uniform(1/8*5,1.0))
                 m.lora_set("strength_clip_min" ,random.uniform(1/8*12,1.0))
-            
+
+        """
+        """
         if random.choice([True, False]):
             loradicRandom(m)
         
@@ -308,13 +312,21 @@ while True:
                 m.pset(nm,"strength_model_min",random.uniform(0.5,1.0))
                 m.pset(nm,"strength_clip_min" ,random.uniform(1.25,1.0))
             m.caddin("NSFW_add","__hunged_girl1__,")
-
+        
         m.pset("EmptyLatentImage","height",768+64*1)
         m.pset("EmptyLatentImage","width",320+64*1)
         
         
         r=m.promptSet()
         r=m.promptGet()
-        print(r)
+        #print()
+        #print(f"promptSet : {r}")
+        print()
+        print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}')
+        print()
+        print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}')
+        print()
+        print(f"m.loratag : {m.loratag}")
+       
         queue_prompt(r,1)
 

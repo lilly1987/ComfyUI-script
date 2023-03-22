@@ -5,6 +5,7 @@ import random
 import copy
 import time
 import types
+import traceback
 #----------------------------
 """
 This script is written under the premise of using my own node.
@@ -45,9 +46,9 @@ ckpts_path=os.path.join(
 ckpts=glob.glob(ckpts_path,recursive=True)
 """
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts] # file name list
-print(f"ckpts cnt : {len(ckptnms)}")
-print(f"ckpts dat : {ckptnms[0]}")
 ckptnm=random.choice(ckptnms)
+print(f"ckpts cnt : {len(ckptnms)}")
+print(f"ckpts dat : {ckptnm}")
 if len(ckptnms) ==0 :
     print(f"!!!!!!!!!! ckpts cnt 0 !!!!!!!!!!!!!")
     quit()
@@ -68,7 +69,7 @@ loranms=[os.path.basename(lora) for lora in loras]
 loranm=random.choice(loranms)
 
 print(f"loras cnt : {len(loranms)}")
-print(f"loras dat : {loranms[0]}")
+print(f"loras dat : {loranm}")
 #----------------------------
 vaes_path=os.path.join(
     os.path.dirname(__file__),
@@ -85,8 +86,8 @@ vaes=glob.glob(vaes_path,recursive=True)
 vae_names=[os.path.basename(vae) for vae in vaes]
 vae_name=random.choice(vae_names)
 
-print(f"loras cnt : {len(loranms)}")
-print(f"loras dat : {loranms[0]}")
+print(f"vaes cnt : {len(vae_names)}")
+print(f"vaes dat : {vae_names}")
 
 #----------------------------
 # global static
@@ -124,10 +125,11 @@ def cget(c,v,t):
 # sand to api
 # max : wait max queue
 def queue_prompt(prompt, max=1):
-    
-    while True:
-        req =  request.Request("http://127.0.0.1:8188/prompt")        
-        with request.urlopen(req) as response:
+    try:
+        while True:
+            req =  request.Request("http://127.0.0.1:8188/prompt")        
+            response=request.urlopen(req) 
+            #with request.urlopen(req) as response:
             html = response.read().decode("utf-8")            
             #print(type(html))
             ld=json.loads(html)
@@ -138,12 +140,18 @@ def queue_prompt(prompt, max=1):
                 break
             print(f"wait queue cnt. now {cnt} < max {max}" )
             time.sleep(2)
-        
-    p = {"prompt": prompt}
-    data = json.dumps(p).encode('utf-8')
-    req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
-    request.urlopen(req)
-    print(f"send" )
+            
+        p = {"prompt": prompt}
+        data = json.dumps(p).encode('utf-8')
+        req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
+
+        request.urlopen(req)
+        print(f"send" )
+    except Exception as e:     
+        print(f"")
+        print(f"send fail : {e}")
+        #print(traceback.format_exc())
+        #traceback.format_exc()
     time.sleep(2)
 
 #----------------------------
@@ -268,7 +276,7 @@ class PromptClass:
             "clip"  : [self.loraClipLast ,1],
             "lora_name": name,
             "strength_model": random.uniform(0.5,1.0),
-            "strength_clip" : random.uniform(0.5,1.5),
+            "strength_clip" : random.uniform(0.5,1.0),
         }    ]
         
     def LoraLoaderR(self,name):
@@ -282,7 +290,7 @@ class PromptClass:
             "strength_model_min": 0.50,
             "strength_model_max": 1.00,
             "strength_clip_min" : 0.50,
-            "strength_clip_max" : 1.50
+            "strength_clip_max" : 1.00
         }]
     
     def lora_add(self, name):
@@ -341,7 +349,7 @@ class PromptClass:
             print("prompt_set error. not dict")
             return None
             
-        print(f"promptSet : {c}" )
+        #print(f"promptSet : {c}" )
         tmp=""
         
         #--------------------------------
@@ -350,7 +358,7 @@ class PromptClass:
         if "positive" in c:        
             if type(c["positive"]) is list:            
                 for t in c["positive"]:
-                    print(f"positive : { t }")
+                    #print(f"positive : { t }")
                     r.append(t)
             else:
                 r.append(lambda c: c["positive"])
@@ -424,9 +432,9 @@ class PromptClass:
         #        self.pget("CheckpointLoaderSimple","ckpt_name")
         #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
         #)
-        print("====")
-        print(self.prompts)
-        print("====")
+        #print()
+        #print(f"promptSet : {self.prompts}")
+        #print()
         return self.prompts
 
     #print(f"ckpts {ckptnms}")
