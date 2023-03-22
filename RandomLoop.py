@@ -6,9 +6,15 @@ import time
 #from LinkedList import LinkedList 
 import time
 import copy  
+import os
 
-print(f"RandomLoop __name__ {__name__}")
-print(f"RandomLoop __file__ {os.path.splitext(os.path.basename(__file__))[0]}")
+
+print(__name__)
+print(os.path.splitext(os.path.basename(__file__))[0])
+if __name__ == os.path.splitext(os.path.basename(__file__))[0] or __name__ =='__main__':
+    from ConsoleColor import print, console
+else:
+    from .ConsoleColor import print, console
 
 from PromptClass import *
 import mypath  
@@ -322,9 +328,9 @@ while True:
         #print()
         #print(f"promptSet : {r}")
         print()
-        print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}')
+        print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}', style="bold green")
         print()
-        print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}')
+        print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}', style="bold green")
         print()
         print(f"m.loratag : {m.loratag}")
        
