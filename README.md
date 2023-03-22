@@ -2,7 +2,7 @@
 
 you want node to https://github.com/lilly1987/ComfyUI_node_Lilly
 
-this scrit ex
+this project need install to https://github.com/lilly1987/ComfyUI_node_Lilly
 
 ## install
 
@@ -16,6 +16,12 @@ this scrit ex
 
 ## ref RandomLoop.py file
 
-- RandomLoop.py
-  - PromptClass.py
-    - wildcards.py
+- RandomLoop.py : loop call api
+  - RandomLoop/settup.json
+    - charLoop : Repeat per character
+    - mychar : A character you want to see often
+  - RandomLoop/chars.json : random chars
+  - RandomLoop/ckpts.json : random checkpoints
+  - RandomLoop/loras.json : random loras
+  - PromptClass.py : 
+    - wildcards.py :
