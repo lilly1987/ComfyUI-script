@@ -357,6 +357,9 @@ class PromptClass:
 
     def lora_set(self,key,value):#,index=0
         #print("lora_set : " , key,value)
+        if not 'lora' in self.c:
+            return
+        
         if type(self.c['lora']) is list:
             for l in self.c['lora']:
                 if l in self.loratag:
