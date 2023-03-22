@@ -61,7 +61,7 @@ def jsondic(full,dic):
             #print(dic)
     else:
         with open(full, 'w', encoding='utf-8') as file:
-            json.dump(dic, file, sort_keys=True, indent=4)
+            json.dump(dic, file, sort_keys=False, indent=4)
             
     return path
         

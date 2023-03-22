@@ -239,16 +239,16 @@ class PromptClass:
     vae_name="Anything-V3.0.vae.safetensors"
 
     #----------------------------
-    shoulder="off shoulder, bare shoulders, Strapless,"
     quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
+    char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
     dress="dress,"
+    shoulder="off shoulder, bare shoulders, Strapless,"
     acc="{acc,|}"
     NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:1.2),"
-    char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
     body="small breasts, slender, nature, curvy,"
-    negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
-    focus=""
     pose=""
+    focus=""
+    negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
     positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus + body
     
     #----------------------------

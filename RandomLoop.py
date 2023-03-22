@@ -22,7 +22,6 @@ from mypath  import jsondic
 PromptClass.dress="{__character_dress__|__dress_my__|},__acc_my__,"
 PromptClass.shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
 PromptClass.quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
-PromptClass.dress="{__character_dress__|__dress_my__|},__acc_my__,"
 PromptClass.NSFW="NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,"
 PromptClass.pose="{standing,|}"
 PromptClass.focus="{full body,|}"
@@ -135,11 +134,11 @@ chars={
         #"negative" : "__no3d__",
         "lora" : ["fashionGirl_v50","fashionGirl_v47"]
     },
-    "liyuuLora_liyuuV1" : {
-        "char" : "black hair, bangs, ",
-        "negative" : "__no3d__",
-        "lora" : "liyuuLora_liyuuV1"
-    },
+    #"liyuuLora_liyuuV1" : {
+    #    "char" : "black hair, bangs, ",
+    #    "negative" : "__no3d__",
+    #    "lora" : "liyuuLora_liyuuV1"
+    #},
     "chineseCosplayerXiaorouseeu_v10" : {
         "char" : "black hair, bangs, ",
         "negative" : "__no3d__",
@@ -180,9 +179,31 @@ chars={
         #"negative" : "__no3d__",
         "lora" : "9a91GirlsFrontline_v10"
     },
-    "my" : {
+    "Katsushika " : {
+        "char" : [
+        "katsushika hokusai \(fate\), kimono, obi, hair flower, sandals, tabi, hair stick, fur collar",
+        "katsushika hokusai \(fate\), kimono, hair flower, sandals, tabi, hair stick, off shoulder, yellow bow",
+        "katsushika hokusai \(fate\), hair ornament, black dress, pale skin, tentacles, red eyes",
+        "katsushika hokusai \(fate\), single hair bun, hooded jacket, shoulder bag, hairpin, skirt, shoes",
+        ],
+        #"negative" : "__no3d__",
+        "lora" : "katsushikaHokusaiFate_v2"
+    },
+    "my1" : {
         "positive" : "__my__",
         #"negative" : "__no2d__",
+    },
+    "my2" : {
+        "quality"  : PromptClass.quality,
+        "char"     : PromptClass.char,
+        "dress"    : PromptClass.dress,
+        "shoulder" : PromptClass.shoulder,
+        "acc"      : PromptClass.acc,
+        "NSFW"     : PromptClass.NSFW,
+        "body"     : PromptClass.body,
+        "pose"     : PromptClass.pose,
+        "focus"    : PromptClass.focus,
+        "negative" : PromptClass.negative,
     },
 
 }
@@ -234,10 +255,9 @@ ckptnmsmy=[
     "RDtMix-fp16",
     "vividicimix_-fp16",
     "VIC-BACLA-MIX-V1-fp16",
+    "kawaiDiffusionSD15_v30LTSFp16",
 ]
 
-charsjsonpath=jsondic("./RandomLoop/chars.json",chars)
-lorasjsonpath=jsondic("./RandomLoop/loras.json",loradic)
 
 #----------------------
 def loradicRandom(m):
@@ -245,10 +265,52 @@ def loradicRandom(m):
     m.lora_add(loradnm)
     m.caddin("NSFW_add",loradic[loradnm])
 #======================
-keys = [list(chars.keys()),["SaegusaMayumi","Tomoyo","diana","primKuroinu_10"]]
+settup={
+    "charLoop" : 2,
+    "mychar" : ["SaegusaMayumi","Tomoyo","diana","primKuroinu_10"],
+    "quality"  : PromptClass.quality,
+    "char"     : PromptClass.char,
+    "dress"    : PromptClass.dress,
+    "shoulder" : PromptClass.shoulder,
+    "acc"      : PromptClass.acc,
+    "NSFW"     : PromptClass.NSFW,
+    "body"     : PromptClass.body,
+    "pose"     : PromptClass.pose,
+    "focus"    : PromptClass.focus,
+    "negative" : PromptClass.negative,
+}
 ckptcnt=0
 while True:
+
+    settupjsonpath=jsondic("./RandomLoop/settup.json",settup)
+    ckptsjsonpath=jsondic("./RandomLoop/ckpts.json",ckptnmsmy)
+    charsjsonpath=jsondic("./RandomLoop/chars.json",chars)
+    lorasjsonpath=jsondic("./RandomLoop/loras.json",loradic)
     
+    for p in [
+        "quality"  ,
+        "char"     ,
+        "dress"    ,
+        "shoulder" ,
+        "acc"      ,
+        "NSFW"     ,
+        "body"     ,
+        "pose"     ,
+        "focus"    ,
+        "negative" 
+    ]:
+        if p in settup :
+            exec(f"PromptClass.{p}=settup[p]")
+        else:
+            exec(f"PromptClass.{p}=''")
+            
+    if "mychar" in settup :
+        if type(settup["mychar"]) is list:
+            keys = [list(chars.keys()),settup["mychar"]]
+        else:
+            keys = [list(chars.keys()),[settup["mychar"]]]
+    else:
+        keys = [list(chars.keys())]
     #random.shuffle(keys)
     c=random.choice(random.choice(keys))
     #for c in keys:
@@ -263,7 +325,8 @@ while True:
     #c="Tomoyo"
     print("c : " + c)
     cc=chars[c]
-    for j in range(2):
+    
+    for j in range(settup["charLoop"] if "charLoop" in settup else 2):
         if ckptcnt <=0 :
             PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
             #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
