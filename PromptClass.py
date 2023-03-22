@@ -6,6 +6,14 @@ import copy
 import time
 import types
 import traceback
+import os
+if __name__ == os.path.splitext(os.path.basename(__file__))[0] or __name__ =='__main__':
+    from ConsoleColor import print, console
+else:
+    from .ConsoleColor import print, console
+print(__file__)
+print(os.path.basename(__file__))
+from rich.progress import Progress,Console
 #----------------------------
 """
 This script is written under the premise of using my own node.
@@ -126,30 +134,38 @@ def cget(c,v,t):
 # max : wait max queue
 def queue_prompt(prompt, max=1):
     try:
-        while True:
-            req =  request.Request("http://127.0.0.1:8188/prompt")        
-            response=request.urlopen(req) 
-            #with request.urlopen(req) as response:
-            html = response.read().decode("utf-8")            
-            #print(type(html))
-            ld=json.loads(html)
-            #print(f"data : {data}" )
-            cnt=ld['exec_info']['queue_remaining']
+        with Progress() as progress:
             
-            if cnt <max:
-                break
-            print(f"wait queue cnt. now {cnt} < max {max}" )
-            time.sleep(2)
-            
-        p = {"prompt": prompt}
-        data = json.dumps(p).encode('utf-8')
-        req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
+            #progress.update(task, completed =60)
+            while True:
+                if progress.finished:
+                    task = progress.add_task("waiting", total=60)
+                req =  request.Request("http://127.0.0.1:8188/prompt")        
+                response=request.urlopen(req) 
+                #with request.urlopen(req) as response:
+                html = response.read().decode("utf-8")            
+                #print(type(html))
+                ld=json.loads(html)
+                #print(f"data : {data}" )
+                cnt=ld['exec_info']['queue_remaining']
+                
+                if cnt <max:
+                    progress.stop()
+                    break
+                    f+=0.1
+                progress.update(task, advance=1)
+
+                #print(f"wait queue cnt. now {cnt} < max {max}" )
+                time.sleep(1)
+                
+            p = {"prompt": prompt}
+            data = json.dumps(p).encode('utf-8')
+            req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
 
         request.urlopen(req)
         print(f"send" )
     except Exception as e:     
-        print(f"")
-        print(f"send fail : {e}")
+        console.print_exception()
         #print(traceback.format_exc())
         #traceback.format_exc()
     time.sleep(2)
@@ -241,7 +257,7 @@ class PromptClass:
         return self.prompts[self.names[name]]["inputs"][input]
         
     def pset(self,name,input,value):
-        #print(f"pset : {name}")
+        #print(f"pset : ", name,input,value)
         #print(f"pset : {self.names[name]}")
         #print(f"pset : {self.prompts[self.names[name]]['inputs']}")
         if not type(self.prompts[self.names[name]]["inputs"][input]) is list :
@@ -292,39 +308,66 @@ class PromptClass:
             "strength_clip_min" : 0.50,
             "strength_clip_max" : 1.00
         }]
-    
-    def lora_add(self, name):
-        #print(f"lora_add : {name}")
-        n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
-        t=self.LoraLoader(name)
-        self.padd(
-            n,
-            t[0],
-            t[1]
-        )
         
-        self.loraModelLast=self.names[n]
-        self.loraClipLast =self.names[n]
-        self.lora_add_after()
-        if n in self.loratag:
-            self.loratag[name]+=[n]
-        else:
-            self.loratag[name]=[n]
+    def lora_addc(self,c=None):
+        if not c:
+            c=self.c
+        if not type(c) is dict:
+            print("prompt_set error. not dict")
+            return None
+            
+        #print(f"lora_addc1 : " , c )
+        if "lora" in c: 
+            r=self.lora_add(lget(c["lora"]))        
+            #print(f"lora_addc2 : " , r )
+            
+        if "loraList" in c: 
+            for lora in c["loraList"]:
+                r=self.lora_add(lget(lora))
+                print(f"lora_addc3 : " , r )
+                
+    def lora_add(self, name):
+        #print(f"lora_add1 : ",name , self.loratag)
+        if not name in self.loratag:
+        
+            #n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
+            t=self.LoraLoader(name)
+            self.padd(
+                name,
+                t[0],
+                t[1]
+            )
+            
+            self.loraModelLast=self.names[name]
+            self.loraClipLast =self.names[name]
+            self.lora_add_after()
+        
+            #self.loratag[name]+=[n]
+            self.loratag[name]=name
+        #else:
+        
         #print(f"loratag[{name}] : {self.loratag[name]}")
-        return n
+        #print(f"lora_add2 : ",name , self.loratag)
+        return self.loratag[name]
         
     def lora_add_after(self):
         self.pset("KSampler"        , "model", [self.loraModelLast,0])
         self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
         self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
 
-    def lora_set(self,key,value,index=0):
+    def lora_set(self,key,value):#,index=0
+        #print("lora_set : " , key,value)
         if type(self.c['lora']) is list:
             for l in self.c['lora']:
                 if l in self.loratag:
-                    self.pset(self.loratag[l][index],key,value)
+                    self.pset(self.loratag[l],key,value)
         else:
-            self.pset(self.loratag[self.c['lora']][index],key,value)
+            #print(self.c['lora'])
+            #print(self.loratag)
+            #print(self.loratag[self.c['lora']][index])
+            self.pset(self.loratag[self.c['lora']],key,value)
+
+
 
     #----------------------------
     def caddin(self,v,t):
@@ -336,10 +379,7 @@ class PromptClass:
         #print(f"---" )
 
     #----------------------------
-    def promptGet(self):
-        return self.prompts
-        
-    def promptSet(self,c=None):
+    def promptGet(self,c=None):
         
         #print(f"dict : {c}" )
         #print(type(c))
@@ -409,6 +449,15 @@ class PromptClass:
         #--------------------------------
         if "vae_name" in c:
             self.pset("VAELoader","vae_name", c["vae_name"])
+            
+        return self.prompts
+        """
+    def promptSet(self,c=None):
+        if not c:
+            c=self.c
+        if not type(c) is dict:
+            print("prompt_set error. not dict")
+            return None
         #--------------------------------
         if "lora" in c: 
             self.lora_add(lget(c["lora"]))        
@@ -436,14 +485,21 @@ class PromptClass:
         #print(f"promptSet : {self.prompts}")
         #print()
         return self.prompts
-
+        """
     #print(f"ckpts {ckptnms}")
     def __init__(self,c):
         #print(f"__init__ ")
-        global ckptnm
+        #global ckptnm
         self.c=copy.deepcopy(c)
+        
         self.prompts={}
         self.names={}
+        
+        self.loratag={}
+        self.LoraLoader=self.LoraLoaderT
+        
+        self.positive=PromptClass.positive
+        self.negative=PromptClass.negative
         self.shoulder=PromptClass.shoulder
         self.quality=PromptClass.quality
         self.dress=PromptClass.dress
@@ -455,13 +511,12 @@ class PromptClass:
         self.body=PromptClass.body
         self.ckptnm=PromptClass.ckptnm
         self.vae_name=PromptClass.vae_name
-        self.loratag={}
-        self.LoraLoader=self.LoraLoaderT
+        
         self.padd(
             "CheckpointLoaderSimple",
             "CheckpointLoaderSimpleText",
             {
-                "ckpt_name": ckptnm
+                "ckpt_name": self.ckptnm
             }
             # model
             # clip
@@ -508,7 +563,7 @@ class PromptClass:
             "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.loraClipLast,1],
-                "text": PromptClass.positive
+                "text": self.positive
             }
         )
 
@@ -518,7 +573,7 @@ class PromptClass:
             "CLIPTextEncodeWildcards",
             {
                 "clip" : [self.loraClipLast,1],
-                "text": PromptClass.negative
+                "text": self.negative
             }
         )
 
@@ -583,7 +638,8 @@ class PromptClass:
             }
         )
         
-        #promptSet(c)
+        self.lora_addc()
+        #self.cpromptSet(self.c)
         #print( f"self.prompts {self.prompts}")
         #print( f"self.names {self.names}")
     #print(names)

@@ -244,7 +244,8 @@ while True:
         #        ]
         #    )
         #)
-    c="Tomoyo"
+    #c="Tomoyo"
+    print("c : " + c)
     cc=chars[c]
     for j in range(2):
         if ckptcnt <=0 :
@@ -323,16 +324,18 @@ while True:
         m.pset("EmptyLatentImage","width",320+64*1)
         
         
-        r=m.promptSet()
+        #r=m.promptSet()
         r=m.promptGet()
+        print()
+        print(f"promptSet : ",r)
+        
         #print()
-        #print(f"promptSet : {r}")
-        print()
-        print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}', style="bold green")
-        print()
-        print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}', style="bold green")
-        print()
-        print(f"m.loratag : {m.loratag}")
+        #print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}', style="bold green")
+        #print()
+        #print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}', style="bold green")
+        #print()
+        #print(f"m.loratag : {m.loratag}")
+        #print()
        
         queue_prompt(r,1)
 
