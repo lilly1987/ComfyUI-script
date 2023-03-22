@@ -17,7 +17,7 @@ else:
     from .ConsoleColor import print, console
 
 from PromptClass import *
-import mypath  
+from mypath  import jsondic
 #----------------------------
 PromptClass.dress="{__character_dress__|__dress_my__|},__acc_my__,"
 PromptClass.shoulder="{off shoulder, bare shoulders, Strapless,|__shoulder__,}"
@@ -186,7 +186,19 @@ chars={
     },
 
 }
+"""
+print(os.path.dirname("./RandomLoop/chars.json"))
+print(os.path.dirname("./RandomLoop/asdf/chars.json"))
 
+print(os.path.basename("./RandomLoop/chars.json"))
+print(os.path.basename("./RandomLoop/asdf/chars.json"))
+
+print(os.path.split("./RandomLoop/chars.json"))
+print(os.path.split("./RandomLoop/asdf/chars.json"))
+"""
+
+
+    
 #----------------------
 loradic={
     "femaleMasturbationBoob_v1" : "masturbation, fingering, female_masturbation, grabbing_own_breast,",
@@ -223,6 +235,10 @@ ckptnmsmy=[
     "vividicimix_-fp16",
     "VIC-BACLA-MIX-V1-fp16",
 ]
+
+charsjsonpath=jsondic("./RandomLoop/chars.json",chars)
+lorasjsonpath=jsondic("./RandomLoop/loras.json",loradic)
+
 #----------------------
 def loradicRandom(m):
     loradnm=random.choice(list(loradic.keys()))
