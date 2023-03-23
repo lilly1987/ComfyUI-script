@@ -126,8 +126,14 @@ def caddin(c,v,t):
         return c[v]
     
 def cget(c,v,t):
+    #print("c",type(c),c)
+    #print("v",type(v),v)
+    #print("t",type(t),t)
     p=c[v] if v in c else t
-    return lget(p)
+    #print("p",type(p),p)
+    l=lget(p)
+    #print("l",type(l),l)
+    return l
     
 #----------------------------
 # sand to api
@@ -234,11 +240,23 @@ def queue_prompt(prompt, max=1):
 
 """
 class PromptClass:
-
+    
     ckptnm="weriDiffusion_v10-fp16.safetensors"
     vae_name="Anything-V3.0.vae.safetensors"
 
     #----------------------------
+    positivenames=[
+            "quality"  ,
+            "char"     ,
+            "dress"    ,
+            "shoulder" ,
+            "acc"      ,
+            "NSFW"     ,
+            "body"     ,
+            "pose"     ,
+            "focus"    ,
+            "style"    ,
+    ]
     quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
     char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
     dress="dress,"
@@ -248,9 +266,11 @@ class PromptClass:
     body="small breasts, slender, nature, curvy,"
     pose=""
     focus=""
+    style=""
     negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
-    positive=quality + char + dress + shoulder + NSFW + acc + pose+ focus + body
-    
+    positive=eval(f"{'+'.join(positivenames)}")    
+    #quality + char + dress + shoulder + NSFW + acc + pose+ focus + body+ style
+    print("positive : ",positive)
     #----------------------------
     def pget(self,name,input):        
         #print(self.prompts[self.names[name]]["inputs"])
@@ -324,7 +344,7 @@ class PromptClass:
         if "loraList" in c: 
             for lora in c["loraList"]:
                 r=self.lora_add(lget(lora))
-                print(f"lora_addc3 : " , r )
+                #print(f"lora_addc3 : " , r )
                 
     def lora_add(self, name):
         #print(f"lora_add1 : ",name , self.loratag)
@@ -385,50 +405,59 @@ class PromptClass:
     def promptGet(self,c=None):
         
         #print(f"dict : {c}" )
-        #print(type(c))
         if not c:
             c=self.c
         if not type(c) is dict:
             print("prompt_set error. not dict")
             return None
+        #print("c : ", c)
             
         #print(f"promptSet : {c}" )
         tmp=""
         
         #--------------------------------
         tmp=""
-        r=[]
+        r={}
         if "positive" in c:        
-            if type(c["positive"]) is list:            
-                for t in c["positive"]:
-                    #print(f"positive : { t }")
-                    r.append(t)
-            else:
-                r.append(lambda c: c["positive"])
+            r["positive"]=lambda c: cget(c,"positive" ,self.positive)
         else:
-            r.append(lambda c: cget(c,"quality",self.quality))
-            r.append(lambda c: cget(c,"char",self.char))
-            r.append(lambda c: cget(c,"dress",self.dress))
-            r.append(lambda c: cget(c,"shoulder",self.shoulder))
-            r.append(lambda c: cget(c,"acc",self.acc)  )
-            r.append(lambda c: cget(c,"NSFW",self.NSFW)  )
-            r.append(lambda c: cget(c,"focus",self.focus)  )
-            r.append(lambda c: cget(c,"pose",self.pose)  )
-            r.append(lambda c: cget(c,"body",self.body)  )
+            #print("self.quality:",type(self.quality),self.quality)
+            for positivename in PromptClass.positivenames:
+                #eval(f"{'+'.join(positivenames)}")  
+                po=eval(f"self.{positivename}")
+                #print("po : ", po)
+                r[positivename]=cget(c,positivename ,po)
+            
+            #r["quality" ]=lambda c: cget(c,"quality" ,self.quality)
+            #r["char"    ]=lambda c: cget(c,"char"    ,self.char)
+            #r["dress"   ]=lambda c: cget(c,"dress"   ,self.dress)
+            #r["shoulder"]=lambda c: cget(c,"shoulder",self.shoulder)
+            #r["acc"     ]=lambda c: cget(c,"acc"     ,self.acc)
+            #r["NSFW"    ]=lambda c: cget(c,"NSFW"    ,self.NSFW)
+            #r["focus"   ]=lambda c: cget(c,"focus"   ,self.focus)
+            #r["pose"    ]=lambda c: cget(c,"pose"    ,self.pose)
+            #r["body"    ]=lambda c: cget(c,"body"    ,self.body)
+            #r["style"   ]=lambda c: cget(c,"style"   ,self.style)
         
-        r.append(lambda c: cget(c,"NSFW_add","")  )
+        r["NSFW_add" ]=cget(c,"NSFW_add" ,"")
+        r["style_add"]=cget(c,"style_add","")
         
         #print(f"NSFW_add : "+cget(c,"NSFW_add",""))
-        random.shuffle(r)
+        random.shuffle([list(r.keys())])
         for f in r:
+            #print("f",f)
+            #if type(r[f]) is types.FunctionType:
+            #    t=f(c)
+            #else:
+            #    t=f
+            #print("promptGet t : ", t)
+            #tmp+=lget(t)
+            #t=r[f](c)
             #print(type(f))
-            #print(f)
-            if type(f) is types.FunctionType:
-                t=f(c)
-            else:
-                t=f
-            #print(t)
-            tmp+=lget(t)
+            #print(type(r[f]))
+            #print(f"f,t : ",f ," ; ",t)
+            #print("r[f]",r[f])
+            tmp+=r[f]
         #print(f"positive : {tmp}")
         if wildcardsOn:
             tmp=wildcards.run(tmp)
@@ -439,7 +468,7 @@ class PromptClass:
             tmp=c["negative"]
         else:
             tmp=self.pget("CLIPTextEncodeN","text")
-            
+        #print(f"negative : ",tmp)
         if "negative_add" in c:
             tmp+=c["negative_add"]
             
@@ -501,19 +530,14 @@ class PromptClass:
         self.loratag={}
         self.LoraLoader=self.LoraLoaderT
         
-        self.positive=PromptClass.positive
-        self.negative=PromptClass.negative
-        self.shoulder=PromptClass.shoulder
-        self.quality=PromptClass.quality
-        self.dress=PromptClass.dress
-        self.NSFW=PromptClass.NSFW
-        self.char=PromptClass.char
-        self.acc=PromptClass.acc
-        self.focus=PromptClass.focus
-        self.pose=PromptClass.pose
-        self.body=PromptClass.body
         self.ckptnm=PromptClass.ckptnm
         self.vae_name=PromptClass.vae_name
+
+        self.positive=PromptClass.positive
+        self.negative=PromptClass.negative
+        
+        for positivename in PromptClass.positivenames:
+            exec(f"self.{positivename}=PromptClass.{positivename}")
         
         self.padd(
             "CheckpointLoaderSimple",

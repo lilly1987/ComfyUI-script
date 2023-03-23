@@ -20,6 +20,7 @@ else:
 from PromptClass import *
 from mypath  import jsondic
 #----------------------------
+#print(f"PromptClass : " , PromptClass.__dict__)
 PromptClass.quality="{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}"
 PromptClass.char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __body1__"
 PromptClass.dress="{__character_dress__|__dress_my__|{frilled|lolita| } {ryal|witch| } {__dressModels__|wearing long {clothes|dress}}|}, {{long |mini |micro } skirt,| }"
@@ -30,8 +31,8 @@ PromptClass.pose="{standing,|}"
 PromptClass.focus="{full body,|}"
 PromptClass.negative="__no2d__"
 PromptClass.positive=PromptClass.quality + PromptClass.char + PromptClass.dress + PromptClass.shoulder + PromptClass.acc + PromptClass.NSFW + PromptClass.focus + PromptClass.pose + PromptClass.body
+#print(f"PromptClass : " , PromptClass.__dict__)
 #----------------------------
-
 chars={ 
     "SaegusaMayumi" : {
         "char" : "{mayumi,__breasts__,|__mayumi__},",
@@ -273,30 +274,28 @@ ckptnmsmy=[
     "VIC-BACLA-MIX-V1-fp16",
     "kawaiDiffusionSD15_v30LTSFp16",
 ]
-
-
 #----------------------
-
-
-#======================
+styles={
+    "arknightsChibiLora_v1" : "chibi, full body, "
+}
+#---------------------------------
+itemnames=PromptClass.positivenames+["negative"]
 settup={
     "charLoop" : 2,
     "mychar" : ["SaegusaMayumi","Tsukihi","Tomoyo","diana","primKuroinu_10"],
-    "quality"  : PromptClass.quality,
-    "char"     : PromptClass.char,
-    "dress"    : PromptClass.dress,
-    "shoulder" : PromptClass.shoulder,
-    "acc"      : PromptClass.acc,
-    "NSFW"     : PromptClass.NSFW,
-    "body"     : PromptClass.body,
-    "pose"     : PromptClass.pose,
-    "focus"    : PromptClass.focus,
-    "negative" : PromptClass.negative,
+    #"mychar" : ["diana",],
     "strength_model_min" : 0.5,
     "strength_model_max" : 1.0,
     "strength_clip_min"  : 0.5,
     "strength_clip_max"  : 1.0,
 }
+#print(f"PromptClass1 : " , PromptClass.__dict__)
+for p in itemnames:
+    settup[p]=eval(f"PromptClass.{p}")
+    
+#print(f"settup : " , settup)
+#print(f"PromptClass2 : " , PromptClass.__dict__)
+#---------------------------------
 ckptcnt=0
 colormy="bright_yellow"
 # [{colormy}] [/{colormy}]
@@ -311,23 +310,14 @@ while True:
     charsjsonpath=jsondic("./RandomLoop/chars.json",chars)
     lorasjsonpath=jsondic("./RandomLoop/loras.json",loradic)
     
-    for p in [
-        "quality"  ,
-        "char"     ,
-        "dress"    ,
-        "shoulder" ,
-        "acc"      ,
-        "NSFW"     ,
-        "body"     ,
-        "pose"     ,
-        "focus"    ,
-        "negative" 
-    ]:
+    #print(f"PromptClass3 : " , PromptClass.__dict__)
+    for p in itemnames:
         if p in settup :
             exec(f"PromptClass.{p}=settup[p]")
-        else:
-            exec(f"PromptClass.{p}=''")
-                
+        #else:
+        #    exec(f"PromptClass.{p}=''")
+    #print(f"PromptClass4 : " , PromptClass.__dict__)
+    
     for key, value in {
         "strength_model_min" : 0.5,
         "strength_model_max" : 1.0,
@@ -342,8 +332,10 @@ while True:
     if "mychar" in settup :
         if type(settup["mychar"]) is list:
             keys = [list(chars.keys()),settup["mychar"]]
+            #keys = [settup["mychar"]]
         else:
             keys = [list(chars.keys()),[settup["mychar"]]]
+            #keys = [[settup["mychar"]]]
     else:
         keys = [list(chars.keys())]
     #random.shuffle(keys)
@@ -358,9 +350,9 @@ while True:
         #    )
         #)
     #c="Tomoyo"
-    print(f"[{colormy}]char : [/{colormy}]" , c)
+    #print(f"[{colormy}]char : [/{colormy}]" , c)
     cc=chars[c]
-    
+    #print(f"cc : " , cc)
     for j in range(settup["charLoop"] if "charLoop" in settup else 2):
         console.rule(f" {c} char Loop ")
         if ckptcnt <=0 :
@@ -373,12 +365,14 @@ while True:
         ckptcnt-=1
         print()
         print(f"[{colormy}]ckptcnt : [/{colormy}]{ckptcnt}")
-        if random.choice([True, False]):
-            cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
-            if "char" in cc:
-                cc["positive"]+=[cc["char"]]
+        #if random.choice([True, False]):
+        #    cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
+        #    if "char" in cc:
+        #        cc["positive"]+=[cc["char"]]
+        #print(f"PromptClass : " , PromptClass.__dict__)
+        m=PromptClass(cc)
+        #print(f"m : " , m.__dict__)
         
-        m=PromptClass(cc)            
         #r=m.promptSet()
         #print(f"promptSet : {r}")
         def lora_set():
@@ -403,6 +397,15 @@ while True:
             m.lora_add(loradnm)
             #lora_set()
             m.caddin("NSFW_add",loradic[loradnm])
+            
+        if random.choice([True]):#, False
+            loradnm=random.choice(list(styles.keys()))
+            m.lora_add(loradnm)
+            #lora_set()
+            #print(f"styles[loradnm] : ",styles[loradnm])
+            m.caddin("style_add",styles[loradnm])
+            #print(f"m.c : ",m.c)
+            
         
         #if random.choice([True, False]):
         #    m.lora_add(random.choice(loranms))
