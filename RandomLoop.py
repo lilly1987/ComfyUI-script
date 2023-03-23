@@ -275,9 +275,9 @@ colormy="bright_yellow"
 # [{colormy}] [/{colormy}]
 while True:
     
-    #if os.path.exists("./RandomLoop/__deletejson__.txt"):
-    #    for filename in glob.glob("./RandomLoop/*.json"):
-    #        os.remove(filename)
+    if os.path.exists("./RandomLoop/__deletejson__.txt"):
+        for filename in glob.glob("./RandomLoop/*.json"):
+            os.remove(filename)
 
     settupjsonpath=jsondic("./RandomLoop/settup.json",settup,True)
     ckptsjsonpath=jsondic("./RandomLoop/ckpts.json",ckptnmsmy)
