@@ -11,8 +11,8 @@ if __name__ == os.path.splitext(os.path.basename(__file__))[0] or __name__ =='__
     from ConsoleColor import print, console
 else:
     from .ConsoleColor import print, console
-print(__file__)
-print(os.path.basename(__file__))
+#print(__file__)
+#print(os.path.basename(__file__))
 from rich.progress import Progress,Console
 #----------------------------
 """
@@ -22,7 +22,7 @@ https://github.com/lilly1987/ComfyUI_node_Lilly
 #----------------------------
 # wildcards support check
 wildcardsOn=False
-print(f"PromptClass __name__ {__name__}")
+#print(f"PromptClass __name__ {__name__}")
 try:
     if __name__ == os.path.splitext(os.path.basename(__file__))[0] :
         from wildcards import wildcards 
@@ -32,7 +32,7 @@ try:
     #wildcards.card_path=os.path.dirname(__file__)+"\\..\\wildcards\\**\\*.txt"
     print("import wildcards succ")
 except Exception as e:     
-    print(f"import wildcards fail : {e}")
+    print(f"import wildcards fail ", e)
     err_msg = traceback.format_exc()
     print(err_msg)
     wildcardsOn=False
@@ -55,8 +55,8 @@ ckpts=glob.glob(ckpts_path,recursive=True)
 """
 ckptnms=[os.path.basename(ckpt) for ckpt in ckpts] # file name list
 ckptnm=random.choice(ckptnms)
-print(f"ckpts cnt : {len(ckptnms)}")
-print(f"ckpts dat : {ckptnm}")
+print(f"[cyan]ckpts cnt : [/cyan]{len(ckptnms)}")
+print(f"[cyan]ckpts dat : [/cyan]{ckptnm}")
 if len(ckptnms) ==0 :
     print(f"!!!!!!!!!! ckpts cnt 0 !!!!!!!!!!!!!")
     quit()
@@ -76,8 +76,8 @@ loras=glob.glob(loras_path,recursive=True)
 loranms=[os.path.basename(lora) for lora in loras]
 loranm=random.choice(loranms)
 
-print(f"loras cnt : {len(loranms)}")
-print(f"loras dat : {loranm}")
+print(f"[cyan]loras cnt : [/cyan]{len(loranms)}")
+print(f"[cyan]loras dat : [/cyan]{loranm}")
 #----------------------------
 vaes_path=os.path.join(
     os.path.dirname(__file__),
@@ -94,8 +94,8 @@ vaes=glob.glob(vaes_path,recursive=True)
 vae_names=[os.path.basename(vae) for vae in vaes]
 vae_name=random.choice(vae_names)
 
-print(f"vaes cnt : {len(vae_names)}")
-print(f"vaes dat : {vae_names}")
+print(f"[cyan]vaes cnt : [/cyan]{len(vae_names)}")
+print(f"[cyan]vaes dat : [/cyan]{vae_names}")
 
 #----------------------------
 # global static
@@ -427,7 +427,7 @@ class PromptClass:
                 t=f(c)
             else:
                 t=f
-            print(t)
+            #print(t)
             tmp+=lget(t)
         #print(f"positive : {tmp}")
         if wildcardsOn:

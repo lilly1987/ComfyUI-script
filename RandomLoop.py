@@ -263,7 +263,7 @@ ckptnmsmy=[
     "AikimiXCv1.5-fp16",
     "AnyTwam-pruned-fp16"
     "Balor-V3.1featACT-fp16",
-    "dreamboxMix-A-fp16-fp16",
+    "dreamboxMix-A",
     "dualPersonality_dualdalcenull-fp16",
     "libmix_v20-fp16",
     "whitespace_Quasar-fp16",
@@ -298,6 +298,8 @@ settup={
     "strength_clip_max"  : 1.0,
 }
 ckptcnt=0
+colormy="bright_yellow"
+# [{colormy}] [/{colormy}]
 while True:
     
     if os.path.exists("./RandomLoop/__deletejson__.txt"):
@@ -356,7 +358,7 @@ while True:
         #    )
         #)
     #c="Tomoyo"
-    print("c : " + c)
+    print(f"[{colormy}]char : [/{colormy}]" , c)
     cc=chars[c]
     
     for j in range(settup["charLoop"] if "charLoop" in settup else 2):
@@ -364,12 +366,12 @@ while True:
             PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
             #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
             print()
-            print(f"ckptnms,ckptnmsmy : {len(ckptnms)},{len(ckptnmsmy)}")
-            print(f"PromptClass.ckptnm : {PromptClass.ckptnm}")
+            print(f"[{colormy}]ckptnms,ckptnmsmy : [/{colormy}]{len(ckptnms)},{len(ckptnmsmy)}")
+            print(f"[{colormy}]PromptClass.ckptnm : [/{colormy}]{PromptClass.ckptnm}")
             ckptcnt=6
         ckptcnt-=1
         print()
-        print(f"ckptcnt {ckptcnt}")
+        print(f"[{colormy}]ckptcnt : [/{colormy}]{ckptcnt}")
         if random.choice([True, False]):
             cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
             if "char" in cc:
@@ -437,7 +439,7 @@ while True:
         #r=m.promptSet()
         r=m.promptGet()
         print()
-        print(f"promptSet : ",r)
+        print(f"[{colormy}]promptSet : [/{colormy}]",r)
         
         #print()
         #print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}', style="bold green")

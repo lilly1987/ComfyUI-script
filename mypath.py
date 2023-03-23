@@ -5,8 +5,8 @@ if __name__ == os.path.splitext(os.path.basename(__file__))[0] :
     from ConsoleColor import print, console
 else:
     from .ConsoleColor import print, console
-print(__file__)
-print(os.path.basename(__file__))
+#print(__file__)
+#print(os.path.basename(__file__))
 
 
 """
