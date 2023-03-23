@@ -1,0 +1,19 @@
+{ 
+    "my" : {
+        "positive" : "__my__",
+        "negative" : ""
+    },
+	 "my2" : {
+        "quality"  :"",
+        "char"     :"",
+        "dress"    :"",
+        "shoulder" :"",
+        "acc"      :"",
+        "NSFW"     :"",
+        "body"     :"",
+        "pose"     :"",
+        "focus"    :"",
+        "style"    :"",
+        "negative" : ""
+    }
+}

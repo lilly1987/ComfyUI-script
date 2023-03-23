@@ -1,0 +1,17 @@
+[
+    "AOM3-fp16",
+    "AOM3A1-fp16",
+    "AOM3A1B-fp16",
+    "AikimiXCv1.5-fp16",
+    "AnyTwam-pruned-fp16",
+    "Balor-V3.1featACT-fp16",
+    "dreamboxMix-A",
+    "dualPersonality_dualdalcenull-fp16",
+    "libmix_v20-fp16",
+    "whitespace_Quasar-fp16",
+    "RememberMix-pruned-fp16",
+    "RDtMix-fp16",
+    "vividicimix_-fp16",
+    "VIC-BACLA-MIX-V1-fp16",
+    "kawaiDiffusionSD15_v30LTSFp16"
+]

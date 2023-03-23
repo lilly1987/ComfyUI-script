@@ -1,0 +1,27 @@
+{
+    "charLoop": 2,
+    "mychar": [
+        "SaegusaMayumi",
+        "Tsukihi",
+        "Tomoyo",
+        "diana",
+        "primKuroinu_10"
+    ],
+    "strength_model_min": 0.5,
+    "strength_model_max": 1.0,
+    "strength_clip_min": 0.5,
+    "strength_clip_max": 1.0,
+    "height": 832,
+    "width": 384,
+    "quality": "{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,|__quality_my__,}",
+    "char": "long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __body1__",
+    "dress": "{__character_dress__|__dress_my__|{frilled|lolita| } {ryal|witch| } {__dressModels__|wearing long {clothes|dress}}|}, {{long |mini |micro } skirt,| }",
+    "shoulder": "{off shoulder, bare shoulders, Strapless,|__shoulder__,}",
+    "acc": "{thighhighs,| } {puffy detached sleeves,| } {choker,| } __heel__, {__acc_my__|}",
+    "NSFW": "NSFW, (breastsout, breasts exposure, nipple exposure:__1.00_1.49__), __NSFW_my__,",
+    "body": "small breasts, slender, nature, curvy,",
+    "pose": "{standing,|}",
+    "focus": "{full body,|}",
+    "style": "",
+    "negative": "__no2d__"
+}

@@ -1,4 +1,4 @@
 
 *.pyc
-RandomLoop/**/*.json
+RandomLoop/*.json
 RandomLoop/__deletejson__.txt

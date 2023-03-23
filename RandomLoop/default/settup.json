@@ -1,0 +1,23 @@
+{
+    "charLoop": 2,
+    "mychar": [
+        "my"
+    ],
+    "strength_model_min": 0.5,
+    "strength_model_max": 1.0,
+    "strength_clip_min": 0.5,
+    "strength_clip_max": 1.0,
+    "height": 832,
+    "width": 384,
+    "quality": "{masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,}",
+    "char": "long hair, sharp eyes, sharply eyelashes, sharply eyeliner, __body1__",
+    "dress": "{{frilled|lolita| } {ryal|witch| } {__dressModels__|wearing long {clothes|dress}}|}, {{long |mini |micro } skirt,| }",
+    "shoulder": "{off shoulder, bare shoulders, Strapless,,}",
+    "acc": "{thighhighs,| } {puffy detached sleeves,| } {choker,| } high heels, ",
+    "NSFW": "NSFW, (breastsout, breasts exposure, nipple exposure), ",
+    "body": "small breasts, slender, nature, curvy,",
+    "pose": "{standing,|}",
+    "focus": "{full body,|}",
+    "style": "",
+    "negative": ""
+}
