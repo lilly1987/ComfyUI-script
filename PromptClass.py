@@ -11,8 +11,7 @@ if __name__ == os.path.splitext(os.path.basename(__file__))[0] or __name__ =='__
     from ConsoleColor import print, console
 else:
     from .ConsoleColor import print, console
-#print(__file__)
-#print(os.path.basename(__file__))
+
 from rich.progress import Progress,Console
 #----------------------------
 """
@@ -22,7 +21,7 @@ https://github.com/lilly1987/ComfyUI_node_Lilly
 #----------------------------
 # wildcards support check
 wildcardsOn=False
-#print(f"PromptClass __name__ {__name__}")
+
 try:
     if __name__ == os.path.splitext(os.path.basename(__file__))[0] :
         from wildcards import wildcards 
@@ -98,11 +97,6 @@ print(f"[cyan]vaes cnt : [/cyan]{len(vae_names)}")
 print(f"[cyan]vaes dat : [/cyan]{vae_names}")
 
 #----------------------------
-# global static
-
-
-
-#----------------------------
 
 def lget(a):
     return random.choice(a) if type(a) is list else a
@@ -148,11 +142,11 @@ def queue_prompt(prompt, max=1):
                     task = progress.add_task("waiting", total=60)
                 req =  request.Request("http://127.0.0.1:8188/prompt")        
                 response=request.urlopen(req) 
-                #with request.urlopen(req) as response:
-                html = response.read().decode("utf-8")            
-                #print(type(html))
+                
+                html = response.read().decode("utf-8")
+                
                 ld=json.loads(html)
-                #print(f"data : {data}" )
+                
                 cnt=ld['exec_info']['queue_remaining']
                 
                 if cnt <max:
@@ -161,7 +155,6 @@ def queue_prompt(prompt, max=1):
                     f+=0.1
                 progress.update(task, advance=1)
 
-                #print(f"wait queue cnt. now {cnt} < max {max}" )
                 time.sleep(1)
                 
             p = {"prompt": prompt}
@@ -172,8 +165,7 @@ def queue_prompt(prompt, max=1):
         print(f"send" )
     except Exception as e:     
         console.print_exception()
-        #print(traceback.format_exc())
-        #traceback.format_exc()
+
     time.sleep(2)
 
 #----------------------------
@@ -257,6 +249,7 @@ class PromptClass:
             "focus"    ,
             "style"    ,
     ]
+    
     quality="masterpiece, best quality, clear details, detailed beautiful face, ultra-detailed,detailed face,"
     char="long hair, sharp eyes, sharply eyelashes, sharply eyeliner, small breasts,"
     dress="dress,"
@@ -267,19 +260,16 @@ class PromptClass:
     pose=""
     focus=""
     style=""
-    negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
+    
     positive=eval(f"{'+'.join(positivenames)}")    
-    #quality + char + dress + shoulder + NSFW + acc + pose+ focus + body+ style
-    print("positive : ",positive)
+    negative="worst quality, low quality, bad hands, extra arms, extra legs, multiple viewer, grayscale, multiple views, monochrome , swimsuit,"
+    
     #----------------------------
     def pget(self,name,input):        
-        #print(self.prompts[self.names[name]]["inputs"])
+        
         return self.prompts[self.names[name]]["inputs"][input]
         
     def pset(self,name,input,value):
-        #print(f"pset : ", name,input,value)
-        #print(f"pset : {self.names[name]}")
-        #print(f"pset : {self.prompts[self.names[name]]['inputs']}")
         if not type(self.prompts[self.names[name]]["inputs"][input]) is list :
             while type(value) is list:
                 value=lget(value)
@@ -297,13 +287,10 @@ class PromptClass:
             "class_type":class_type,
             "inputs":inputs
         }
-        #print(f"padd : {name}" )
-        #print(f"padd : {self.names}" )
-        
     #----------------------------
-    
-    
-    
+    def caddin(self,v,t):
+        caddin(self.c,v,t)
+    #----------------------------           
     def LoraLoaderT(self,name):
         return [
         "LoraLoaderText",
@@ -336,21 +323,15 @@ class PromptClass:
             print("prompt_set error. not dict")
             return None
             
-        #print(f"lora_addc1 : " , c )
         if "lora" in c: 
             r=self.lora_add(lget(c["lora"]))        
-            #print(f"lora_addc2 : " , r )
             
         if "loraList" in c: 
             for lora in c["loraList"]:
                 r=self.lora_add(lget(lora))
-                #print(f"lora_addc3 : " , r )
                 
     def lora_add(self, name):
-        #print(f"lora_add1 : ",name , self.loratag)
-        if not name in self.loratag:
-        
-            #n=f"{name}_{self.loraModelLast}_{self.loraClipLast}"
+        if not name in self.loratag:            
             t=self.LoraLoader(name)
             self.padd(
                 name,
@@ -361,13 +342,9 @@ class PromptClass:
             self.loraModelLast=self.names[name]
             self.loraClipLast =self.names[name]
             self.lora_add_after()
-        
-            #self.loratag[name]+=[n]
+
             self.loratag[name]=name
-        #else:
-        
-        #print(f"loratag[{name}] : {self.loratag[name]}")
-        #print(f"lora_add2 : ",name , self.loratag)
+
         return self.loratag[name]
         
     def lora_add_after(self):
@@ -375,8 +352,7 @@ class PromptClass:
         self.pset("CLIPTextEncodeN" , "clip" , [self.loraClipLast ,1])
         self.pset("CLIPTextEncodeP" , "clip" , [self.loraClipLast ,1])
 
-    def lora_set(self,key,value):#,index=0
-        #print("lora_set : " , key,value)
+    def lora_set(self,key,value):
         if not 'lora' in self.c:
             return
         
@@ -385,143 +361,65 @@ class PromptClass:
                 if l in self.loratag:
                     self.pset(self.loratag[l],key,value)
         else:
-            #print(self.c['lora'])
-            #print(self.loratag)
-            #print(self.loratag[self.c['lora']][index])
             self.pset(self.loratag[self.c['lora']],key,value)
-
-
-
-    #----------------------------
-    def caddin(self,v,t):
-        #print(f"---" )
-        #print(f"caddin : {t}" )
-        #print(f"self.c : {self.c}" )
-        caddin(self.c,v,t)
-        #print(f"self.c : {self.c}" )
-        #print(f"---" )
 
     #----------------------------
     def promptGet(self,c=None):
-        
-        #print(f"dict : {c}" )
+
         if not c:
             c=self.c
         if not type(c) is dict:
             print("prompt_set error. not dict")
             return None
-        #print("c : ", c)
-            
-        #print(f"promptSet : {c}" )
-        tmp=""
-        
+
         #--------------------------------
         tmp=""
         r={}
         if "positive" in c:        
             r["positive"]=lambda c: cget(c,"positive" ,self.positive)
         else:
-            #print("self.quality:",type(self.quality),self.quality)
             for positivename in PromptClass.positivenames:
-                #eval(f"{'+'.join(positivenames)}")  
                 po=eval(f"self.{positivename}")
-                #print("po : ", po)
                 r[positivename]=cget(c,positivename ,po)
-            
-            #r["quality" ]=lambda c: cget(c,"quality" ,self.quality)
-            #r["char"    ]=lambda c: cget(c,"char"    ,self.char)
-            #r["dress"   ]=lambda c: cget(c,"dress"   ,self.dress)
-            #r["shoulder"]=lambda c: cget(c,"shoulder",self.shoulder)
-            #r["acc"     ]=lambda c: cget(c,"acc"     ,self.acc)
-            #r["NSFW"    ]=lambda c: cget(c,"NSFW"    ,self.NSFW)
-            #r["focus"   ]=lambda c: cget(c,"focus"   ,self.focus)
-            #r["pose"    ]=lambda c: cget(c,"pose"    ,self.pose)
-            #r["body"    ]=lambda c: cget(c,"body"    ,self.body)
-            #r["style"   ]=lambda c: cget(c,"style"   ,self.style)
-        
+
         r["NSFW_add" ]=cget(c,"NSFW_add" ,"")
         r["style_add"]=cget(c,"style_add","")
-        
-        #print(f"NSFW_add : "+cget(c,"NSFW_add",""))
+
         random.shuffle([list(r.keys())])
         for f in r:
-            #print("f",f)
-            #if type(r[f]) is types.FunctionType:
-            #    t=f(c)
-            #else:
-            #    t=f
-            #print("promptGet t : ", t)
-            #tmp+=lget(t)
-            #t=r[f](c)
-            #print(type(f))
-            #print(type(r[f]))
-            #print(f"f,t : ",f ," ; ",t)
-            #print("r[f]",r[f])
             tmp+=r[f]
-        #print(f"positive : {tmp}")
+            
         if wildcardsOn:
             tmp=wildcards.run(tmp)
-        #print(f"positive : {tmp}")
+
         self.pset("CLIPTextEncodeP","text", tmp)
+        
         #--------------------------------
         if "negative" in c:
             tmp=c["negative"]
         else:
             tmp=self.pget("CLIPTextEncodeN","text")
-        #print(f"negative : ",tmp)
+
         if "negative_add" in c:
             tmp+=c["negative_add"]
             
         if wildcardsOn:
             tmp=wildcards.run(tmp)
+            
         self.pset("CLIPTextEncodeN","text", tmp)
+        
         #--------------------------------
         if "ckptnm" in c:
             self.pset("CheckpointLoaderSimple","ckpt_name", c["ckptnm"])
+            
         #--------------------------------
         if "vae_name" in c:
             self.pset("VAELoader","vae_name", c["vae_name"])
             
         return self.prompts
-        """
-    def promptSet(self,c=None):
-        if not c:
-            c=self.c
-        if not type(c) is dict:
-            print("prompt_set error. not dict")
-            return None
-        #--------------------------------
-        if "lora" in c: 
-            self.lora_add(lget(c["lora"]))        
-            
-        if "loraList" in c: 
-            for lora in c["loraList"]:
-                self.lora_add(lget(lora))
-        #--------------------------------
-        #self.psetd(
-        #    "KSampler",
-        #    {
-        #        "seed":random.randint(0, 0xffffffffffffffff ),
-        #        "steps":random.randint(20, 30 ),
-        #        "cfg":random.randint(int(5*2) , int(9*2) ) / 2,
-        #        "denoise":random.uniform(0.75,1.0) ,
-        #    }
-        #)
-        #--------------------------------
-        #self.pset("SaveImage","filename_prefix" , 
-        #    os.path.splitext(
-        #        self.pget("CheckpointLoaderSimple","ckpt_name")
-        #    )[0]+"-"+str(random.randint(0, 0xffffffffffffffff ))
-        #)
-        #print()
-        #print(f"promptSet : {self.prompts}")
-        #print()
-        return self.prompts
-        """
-    #print(f"ckpts {ckptnms}")
+
     def __init__(self,c):
-        #print(f"__init__ ")
-        #global ckptnm
+
         self.c=copy.deepcopy(c)
         
         self.prompts={}
@@ -545,44 +443,10 @@ class PromptClass:
             {
                 "ckpt_name": self.ckptnm
             }
-            # model
-            # clip
-            # vae
         )
 
         self.loraModelLast=self.names["CheckpointLoaderSimple"]
         self.loraClipLast =self.names["CheckpointLoaderSimple"]
-
-        """
-        self.padd(
-            
-            "LoraLoaderTextRandom",
-            "LoraLoaderTextRandom",
-            {
-                "model" : [self.names["CheckpointLoaderSimple"],0],
-                "clip" : [self.names["CheckpointLoaderSimple"],1],
-                "lora_name": "",
-                "seed": random.randint(0, 0xffffffffffffffff ),
-                "strength_model_min": 0.50,
-                "strength_model_max": 1.0,
-                "strength_clip_min": 0.50,
-                "strength_clip_max": 1.0
-            }
-        )
-        """
-        """
-        self.padd(
-            "LoraLoader",
-            "LoraLoader",
-            {
-                "model" : [names["CheckpointLoaderSimple"],0],
-                "clip" : [names["CheckpointLoaderSimple"],1],
-                "lora_name": "dianaCavendishLittle_v11ClothesFix.safetensors",
-                "strength_model": 1.0,
-                "strength_clip": 1.0
-            }
-        )
-        """
 
         self.padd(
             
@@ -661,13 +525,7 @@ class PromptClass:
                 "filename_prefix": os.path.splitext(
                     self.pget("CheckpointLoaderSimple","ckpt_name")
                 )[0]
-                #+"-"+str(random.randint(0, 0xffffffffffffffff )),
             }
         )
         
         self.lora_addc()
-        #self.cpromptSet(self.c)
-        #print( f"self.prompts {self.prompts}")
-        #print( f"self.names {self.names}")
-    #print(names)
-    #print(prompt)
