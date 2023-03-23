@@ -210,33 +210,8 @@ chars={
         "positive" : "__my__",
         #"negative" : "__no2d__",
     },
-    #"my2" : {
-    #    "quality"  : PromptClass.quality,
-    #    "char"     : PromptClass.char,
-    #    "dress"    : PromptClass.dress,
-    #    "shoulder" : PromptClass.shoulder,
-    #    "acc"      : PromptClass.acc,
-    #    "NSFW"     : PromptClass.NSFW,
-    #    "body"     : PromptClass.body,
-    #    "pose"     : PromptClass.pose,
-    #    "focus"    : PromptClass.focus,
-    #    "negative" : PromptClass.negative,
-    #},
-
 }
-"""
-print(os.path.dirname("./RandomLoop/chars.json"))
-print(os.path.dirname("./RandomLoop/asdf/chars.json"))
-
-print(os.path.basename("./RandomLoop/chars.json"))
-print(os.path.basename("./RandomLoop/asdf/chars.json"))
-
-print(os.path.split("./RandomLoop/chars.json"))
-print(os.path.split("./RandomLoop/asdf/chars.json"))
-"""
-
-
-    
+   
 #----------------------
 loradic={
     "femaleMasturbationBoob_v1" : "masturbation, fingering, female_masturbation, grabbing_own_breast,",
@@ -280,54 +255,42 @@ styles={
 }
 #---------------------------------
 itemnames=PromptClass.positivenames+["negative"]
+
 settup={
     "charLoop" : 2,
     "mychar" : ["SaegusaMayumi","Tsukihi","Tomoyo","diana","primKuroinu_10"],
-    #"mychar" : ["diana",],
     "strength_model_min" : 0.5,
     "strength_model_max" : 1.0,
     "strength_clip_min"  : 0.5,
     "strength_clip_max"  : 1.0,
+    "height"  : 768+64*1,
+    "width"  : 320+64*1,
 }
-#print(f"PromptClass1 : " , PromptClass.__dict__)
 for p in itemnames:
     settup[p]=eval(f"PromptClass.{p}")
-    
-#print(f"settup : " , settup)
-#print(f"PromptClass2 : " , PromptClass.__dict__)
+
 #---------------------------------
 ckptcnt=0
 colormy="bright_yellow"
 # [{colormy}] [/{colormy}]
 while True:
     
-    if os.path.exists("./RandomLoop/__deletejson__.txt"):
-        for filename in glob.glob("./RandomLoop/*.json"):
-            os.remove(filename)
+    #if os.path.exists("./RandomLoop/__deletejson__.txt"):
+    #    for filename in glob.glob("./RandomLoop/*.json"):
+    #        os.remove(filename)
 
-    settupjsonpath=jsondic("./RandomLoop/settup.json",settup)
+    settupjsonpath=jsondic("./RandomLoop/settup.json",settup,True)
     ckptsjsonpath=jsondic("./RandomLoop/ckpts.json",ckptnmsmy)
     charsjsonpath=jsondic("./RandomLoop/chars.json",chars)
     lorasjsonpath=jsondic("./RandomLoop/loras.json",loradic)
-    
-    #print(f"PromptClass3 : " , PromptClass.__dict__)
+
     for p in itemnames:
         if p in settup :
             exec(f"PromptClass.{p}=settup[p]")
-        #else:
-        #    exec(f"PromptClass.{p}=''")
-    #print(f"PromptClass4 : " , PromptClass.__dict__)
-    
-    for key, value in {
-        "strength_model_min" : 0.5,
-        "strength_model_max" : 1.0,
-        "strength_clip_min"  : 0.5,
-        "strength_clip_max"  : 1.0,
-    }.items():
-        if key in settup :
-            exec(f"{key}=settup[key]")
-        else:
-            exec(f"{key}=value")
+
+    #for key, value in settupneed.items():
+    #    if not key in settup :
+    #        settup[key]=value
             
     if "mychar" in settup :
         if type(settup["mychar"]) is list:
@@ -338,23 +301,15 @@ while True:
             #keys = [[settup["mychar"]]]
     else:
         keys = [list(chars.keys())]
+        
     #random.shuffle(keys)
     c=random.choice(random.choice(keys))
-    #for c in keys:
-        #c=random.choice(
-        #    random.choice(
-        #        [
-        #            ,
-        #            list(chars.keys())
-        #        ]
-        #    )
-        #)
     #c="Tomoyo"
-    #print(f"[{colormy}]char : [/{colormy}]" , c)
     cc=chars[c]
-    #print(f"cc : " , cc)
     for j in range(settup["charLoop"] if "charLoop" in settup else 2):
+    
         console.rule(f" {c} char Loop ")
+        
         if ckptcnt <=0 :
             PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
             #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
@@ -363,95 +318,61 @@ while True:
             print(f"[{colormy}]PromptClass.ckptnm : [/{colormy}]{PromptClass.ckptnm}")
             ckptcnt=6
         ckptcnt-=1
+        
         print()
         print(f"[{colormy}]ckptcnt : [/{colormy}]{ckptcnt}")
+        
         #if random.choice([True, False]):
         #    cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
         #    if "char" in cc:
         #        cc["positive"]+=[cc["char"]]
-        #print(f"PromptClass : " , PromptClass.__dict__)
+        #print("cc : ", cc)
         m=PromptClass(cc)
-        #print(f"m : " , m.__dict__)
-        
-        #r=m.promptSet()
-        #print(f"promptSet : {r}")
-        def lora_set():
-            if m.LoraLoader==m.LoraLoaderT :
-                m.lora_set("strength_model",random.uniform(strength_model_min,strength_model_max))
-                m.lora_set("strength_clip" ,random.uniform(strength_clip_min,strength_clip_max))                
-            if m.LoraLoader==m.LoraLoaderR :
-                m.lora_set("strength_model_min",random.uniform(strength_model_min,strength_model_max))
-                m.lora_set("strength_clip_min" ,random.uniform(strength_clip_min,strength_clip_max))
                 
-        #if "lora" in cc:
-        #    #print(f"")
-        #    #print(f"chars[c]['lora'] : {cc['lora']}")
-        #    #print(f"chars[c]['lora'] : {type(cc['lora'])}")
-        #    #print(f"loratag : {m.loratag}")
-        #    lora_set()
-
-        """
-        """
-        if random.choice([True]):#, False
+        if random.choice([True, False]):#, False
             loradnm=random.choice(list(loradic.keys()))
             m.lora_add(loradnm)
-            #lora_set()
             m.caddin("NSFW_add",loradic[loradnm])
             
-        if random.choice([True]):#, False
+        if random.choice([True, False]):#, False
             loradnm=random.choice(list(styles.keys()))
             m.lora_add(loradnm)
-            #lora_set()
-            #print(f"styles[loradnm] : ",styles[loradnm])
             m.caddin("style_add",styles[loradnm])
-            #print(f"m.c : ",m.c)
-            
-        
+
         #if random.choice([True, False]):
         #    m.lora_add(random.choice(loranms))
-            #lora_set()
+
         """
         if random.choice([True, False]):
         #if True:
             nm=m.lora_add("breastsOutExposed_24")
-            #lora_set()
             m.caddin("NSFW_add",loradic["breastsOutExposed_24"])
             
         if random.choice([True, False]):
         #if True:
             nm=m.lora_add("conceptCowgirl_v10")
-            #lora_set()
             m.caddin("NSFW_add","__Cowgirl1__,")
         
         if random.choice([True, False]):
         #if True:
             nm=m.lora_add("hunged_girl")
-            #lora_set()
             m.caddin("NSFW_add","__hunged_girl1__,")
         """
-        m.pset("EmptyLatentImage","height",768+64*1)
-        m.pset("EmptyLatentImage","width",320+64*1)
-        """
-        if m.LoraLoader==m.LoraLoaderT :
-            m.lora_set("strength_model",random.uniform(strength_model_min,strength_model_max))
-            m.lora_set("strength_clip" ,random.uniform(strength_clip_min,strength_clip_max))                
-        if m.LoraLoader==m.LoraLoaderR :
-            m.lora_set("strength_model_min",random.uniform(strength_model_min,strength_model_max))
-            m.lora_set("strength_clip_min" ,random.uniform(strength_clip_min,strength_clip_max))
-        """
         
-        #r=m.promptSet()
+        def lora_set():
+            if m.LoraLoader==m.LoraLoaderT :
+                m.lora_set("strength_model",random.uniform(settup[strength_model_min],settup[strength_model_max]))
+                m.lora_set("strength_clip" ,random.uniform(settup[strength_clip_min],settup[strength_clip_max]))                
+            if m.LoraLoader==m.LoraLoaderR :
+                m.lora_set("strength_model_min",random.uniform(settup[strength_model_min],settup[strength_model_max]))
+                m.lora_set("strength_clip_min" ,random.uniform(settup[strength_clip_min],settup[strength_clip_max]))    
+                
+        m.pset("EmptyLatentImage","height",settup["height"])
+        m.pset("EmptyLatentImage","width",settup["width"])
+
         r=m.promptGet()
         print()
         print(f"[{colormy}]promptSet : [/{colormy}]",r)
-        
-        #print()
-        #print(f'm.CLIPTextEncodeP : {m.pget("CLIPTextEncodeP","text")}', style="bold green")
-        #print()
-        #print(f'm.CLIPTextEncodeN : {m.pget("CLIPTextEncodeN","text")}', style="bold green")
-        #print()
-        #print(f"m.loratag : {m.loratag}")
-        #print()
-       
+
         queue_prompt(r,1)
 

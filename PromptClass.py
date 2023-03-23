@@ -371,30 +371,38 @@ class PromptClass:
         if not type(c) is dict:
             print("prompt_set error. not dict")
             return None
-
+        print("[bright_yellow]char : [/bright_yellow]", c)
         #--------------------------------
-        tmp=""
+        
         r={}
+        print("positive in ", "positive" in c)
         if "positive" in c:        
-            r["positive"]=lambda c: cget(c,"positive" ,self.positive)
+            r["positive"]=cget(c,"positive" ,self.positive)
         else:
+            #print("PromptClass.positivenames : ",PromptClass.positivenames)
             for positivename in PromptClass.positivenames:
                 po=eval(f"self.{positivename}")
                 r[positivename]=cget(c,positivename ,po)
+                #print(f"r\[{positivename}] : ",r[positivename])
 
         r["NSFW_add" ]=cget(c,"NSFW_add" ,"")
         r["style_add"]=cget(c,"style_add","")
 
-        random.shuffle([list(r.keys())])
-        for f in r:
+        ks=list(r.keys())
+        random.shuffle(ks)
+        #print("ks : ",ks)
+        tmp=""
+        for f in ks:
             tmp+=r[f]
             
         if wildcardsOn:
             tmp=wildcards.run(tmp)
-
+            
+        print("[bright_yellow]positive : [/bright_yellow]", tmp)
         self.pset("CLIPTextEncodeP","text", tmp)
         
         #--------------------------------
+        print("[bright_yellow]negative in [bright_yellow]", "negative" in c)
         if "negative" in c:
             tmp=c["negative"]
         else:
@@ -405,7 +413,8 @@ class PromptClass:
             
         if wildcardsOn:
             tmp=wildcards.run(tmp)
-            
+        
+        print("[bright_yellow]negative : [/bright_yellow]", tmp)
         self.pset("CLIPTextEncodeN","text", tmp)
         
         #--------------------------------
