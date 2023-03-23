@@ -375,7 +375,7 @@ class PromptClass:
         #--------------------------------
         
         r={}
-        print("positive in ", "positive" in c)
+        #print("[bright_yellow]positive in [/bright_yellow]", "positive" in c)
         if "positive" in c:        
             r["positive"]=cget(c,"positive" ,self.positive)
         else:
@@ -402,7 +402,7 @@ class PromptClass:
         self.pset("CLIPTextEncodeP","text", tmp)
         
         #--------------------------------
-        print("[bright_yellow]negative in [bright_yellow]", "negative" in c)
+        #print("[bright_yellow]negative in [bright_yellow]", "negative" in c)
         if "negative" in c:
             tmp=c["negative"]
         else:
