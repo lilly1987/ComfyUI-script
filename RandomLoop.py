@@ -194,7 +194,12 @@ chars={
     "Ayesha" : {
         "char" : "charayesha, ayesha altugle,",
         #"negative" : "__no3d__",
-        "lora" : "araragiTsukihiLora_v1"
+        "lora" : "atelierAyeshaAyeshaAltugle_v1"
+    },
+    "bannerOfTheMaidNicoletteOudinot_grenadierV10" : {
+        "char" : "grenadier,",
+        #"negative" : "__no3d__",
+        "lora" : "bannerOfTheMaidNicoletteOudinot_grenadierV10"
     },
     "Katsushika " : {
         "char" : [
@@ -287,10 +292,6 @@ while True:
     for p in itemnames:
         if p in settup :
             exec(f"PromptClass.{p}=settup[p]")
-
-    #for key, value in settupneed.items():
-    #    if not key in settup :
-    #        settup[key]=value
             
     if "mychar" in settup :
         if type(settup["mychar"]) is list:
@@ -339,8 +340,9 @@ while True:
             m.lora_add(loradnm)
             m.caddin("style_add",styles[loradnm])
 
-        #if random.choice([True, False]):
-        #    m.lora_add(random.choice(loranms))
+        if random.choice([True, False]):
+            loradnm=random.choice(loranms)
+            m.lora_add(loradnm)
 
         """
         if random.choice([True, False]):
