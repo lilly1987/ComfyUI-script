@@ -60,19 +60,15 @@ while True:
             tmp=""
             if os.path.exists(f"./RandomLoop/{name}.json"):
                 tmp=jsondic(f"./RandomLoop/{name}.json",item,update)
-                #print("1",tmp,item,style="reset")
             #elif os.path.exists(f"./RandomLoop/sample/{name}.json"):
             #    return jsondic(f"./RandomLoop/sample/{name}.json",item,update)
             elif os.path.exists(f"./RandomLoop/default/{name}.json"):
                 tmp=jsondic(f"./RandomLoop/default/{name}.json",item,update)
-                #print("3",tmp,item,style="reset")
-            #print("4",tmp,style="reset")
             return tmp
                 
         settupjsonpath=jsonget("settup",settup,True)
         ckptsjsonpath=jsonget("ckpts",ckptnmsmy,True)
         charsjsonpath=jsonget("chars",chars,True)
-        #print("chars",chars,style="reset")
         lorasjsonpath=jsonget("loras",loradic,True)
         
         for p in itemnames:
@@ -80,25 +76,17 @@ while True:
                 exec(f"PromptClass.{p}=settup[p]")
         
         keys = [list(chars.keys())]
-        #print("keys",keys)
         if "mychar" in settup :
             if type(settup["mychar"]) is list:
                 keys += [settup["mychar"]]
-                #keys = [settup["mychar"]]
             else:
                 keys += [[settup["mychar"]]]
-                #keys = [[settup["mychar"]]]
-        #print("keys",keys)
-        
-        
 
-        #print(f"[{colormy}]ckptnms,ckptnmsmy : [/{colormy}]",len(ckptnms),len(ckptnmsmy))
-        #print(f"[{colormy}]ckptnms,ckptnmsmy : [/{colormy}]",ckptnms,ckptnmsmy)
-        
         if len(ckptnmsmy)>0:
             ckptnms2=[ckptnms,ckptnmsmy]
         else:
             ckptnms2=[ckptnms]
+            
         #random.shuffle(keys)
         c=random.choice(random.choice(keys))
         #c="Tomoyo"
@@ -118,11 +106,6 @@ while True:
             print()
             print(f"[{colormy}]ckptcnt : [/{colormy}]{ckptcnt}")
             
-            #if random.choice([True, False]):
-            #    cc["positive"]=["__quality1__,","__dress1__,","__NSFW1__,","__body1__,"]
-            #    if "char" in cc:
-            #        cc["positive"]+=[cc["char"]]
-            #print("cc : ", cc)
             m=PromptClass(cc)
                     
             if random.choice([True, False]) and len(loradic)>0:#, False
