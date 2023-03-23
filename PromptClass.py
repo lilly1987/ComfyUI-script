@@ -427,8 +427,8 @@ class PromptClass:
                 t=f(c)
             else:
                 t=f
-            #print(t)
-            tmp+=t
+            print(t)
+            tmp+=lget(t)
         #print(f"positive : {tmp}")
         if wildcardsOn:
             tmp=wildcards.run(tmp)

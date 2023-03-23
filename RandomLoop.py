@@ -1,4 +1,5 @@
-import os, glob, sys
+import os, sys
+import glob
 import json
 from urllib import request, parse
 import random
@@ -184,6 +185,16 @@ chars={
         #"negative" : "__no3d__",
         "lora" : "9a91GirlsFrontline_v10"
     },
+    "Tsukihi" : {
+        "char" : "araragi tsukihi, black {short|long} hair, bangs, {green kimono,{short kimono,|}|}",
+        #"negative" : "__no3d__",
+        "lora" : "araragiTsukihiLora_v1"
+    },
+    "Ayesha" : {
+        "char" : "charayesha, ayesha altugle,",
+        #"negative" : "__no3d__",
+        "lora" : "araragiTsukihiLora_v1"
+    },
     "Katsushika " : {
         "char" : [
         "katsushika hokusai \(fate\), kimono, obi, hair flower, sandals, tabi, hair stick, fur collar",
@@ -270,7 +281,7 @@ ckptnmsmy=[
 #======================
 settup={
     "charLoop" : 2,
-    "mychar" : ["SaegusaMayumi","Tomoyo","diana","primKuroinu_10"],
+    "mychar" : ["SaegusaMayumi","Tsukihi","Tomoyo","diana","primKuroinu_10"],
     "quality"  : PromptClass.quality,
     "char"     : PromptClass.char,
     "dress"    : PromptClass.dress,
@@ -288,6 +299,10 @@ settup={
 }
 ckptcnt=0
 while True:
+    
+    if os.path.exists("./RandomLoop/__deletejson__.txt"):
+        for filename in glob.glob("./RandomLoop/*.json"):
+            os.remove(filename)
 
     settupjsonpath=jsondic("./RandomLoop/settup.json",settup)
     ckptsjsonpath=jsondic("./RandomLoop/ckpts.json",ckptnmsmy)
