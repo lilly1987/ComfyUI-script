@@ -362,6 +362,7 @@ while True:
     cc=chars[c]
     
     for j in range(settup["charLoop"] if "charLoop" in settup else 2):
+        console.rule(f" {c} char Loop ")
         if ckptcnt <=0 :
             PromptClass.ckptnm=random.choice(random.choice([ckptnms,ckptnmsmy]))
             #PromptClass.ckptnm="VIC-BACLA-MIX-V1-fp16"
