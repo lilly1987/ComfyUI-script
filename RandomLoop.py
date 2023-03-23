@@ -18,7 +18,7 @@ else:
     from .ConsoleColor import print, console
 
 from PromptClass import *
-from mypath  import jsondic
+from jsondic import jsondic
 
 #print(f"PromptClass : " , PromptClass.__dict__)
 #----------------------------
