@@ -1,0 +1,183 @@
+{ 
+    "SaegusaMayumi" : {
+        "char" : "{mayumi,__breasts__,|__mayumi__},",
+        #"dress" : [ "mahouka_uniformm, green_jacket, see-through lace white long sleeveless dress, shoulder, black high heels, black_pantyhose,","__SaegusaMayumidress__" ,dress],
+        "dress" : "{__SaegusaMayumidress__|__character_dress__|__dress_my__|}, " ,
+        "lora" : "SaegusaMayumiTheIrregularAt_mayumi",
+    },
+    "Tomoyo" : {
+        "char" : "(daidouji_tomoyo:1.2), (tomoyo:1.2), black long hair, blunt bangs, small breasts, cardcaptor sakura \(style\),",
+        #"dress" : "{__character_dress__},"+shoulder ,
+        "lora" : ["daidoujiTomoyo_v01.safetensors","tomoyo_V1Epoch6.safetensors","sakuraKinomoto_sakuraV1Epoch6.safetensors","cardcaptorSakura_sakuraEpoch6.safetensors"],
+    },
+    "diana" : {
+        "char" : "diana cavendish, long wavy hair, multicolored two-tone streaked hair, light green hair, light blonde hair, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : "dianaCavendishLittle_v11ClothesFix.safetensors",
+        "dress":"{__diana_cavendish_dress__|__character_dress__|__dress_my__|},",
+        "acc":"__acc_my__,"
+    },
+    "schnee" : {
+        "char" : "weiss schnee, white long hair, bangs, hair between eye, {sharp eyes, sharply eyelashes, sharply eyeliner,| } small breasts,",
+        "lora" : ["weissSchneeRWBY_weissSchneeV10.safetensors","weissSchneeLORA_weissSchnee.safetensors"],
+        #"dress": "{__character_dress__|__diana_cavendish_dress__},"
+    },
+    "lillie" : {
+        "char" : "character_pokemon_lillie, hat,",
+        #"negative" : "__no2d__",
+        "lora" : "pokemonLillieLilieSD15_v4"
+    },
+#    "sailorMercury" : {
+#        "char" : "sailormercury, hat,",
+#       # "negative" : "__no2d__",
+#        "lora" : "sailorMercury_v10"
+#    },
+    "lovedollLikenessMiyou" : {
+        "char" : "photorealistic, __my__",
+        "negative" : "__no3d__",
+        "lora" : "lovedollLikenessMiyou_v10"
+    },
+    #"ShiningBladeIra_ira" : {
+    #    #"char" : "photorealistic, __my__",
+    #    #"negative" : "__no3d__",
+    #    "lora" : "ShiningBladeIra_ira"
+    #},
+    "riceShowerUmamusume_v10" : {
+        "char" : "(rice shower \(umamusume\)),",
+       # "negative" : "__no2d__",
+        "lora" : "riceShowerUmamusume_v10"
+    },
+    "solutionEpsilon_v10" : {
+        "char" : "solution_epsilon,",
+        #"negative" : "__no2d__",
+        "lora" : "solutionEpsilon_v10"
+    },
+    "yorBriarSpyFamily_lykonV1" : {
+        "char" : "__yor_briar_head__,",
+        #"negative" : "__no2d__",
+        "lora" : "yorBriarSpyFamily_lykonV1"
+    },
+    "keqingGenshinImpactLora_v10" : {
+        "char" : "keqing \(genshin impact\),",
+        #"negative" : "__no2d__",
+        "lora" : "keqingGenshinImpactLora_v10"
+    },
+    "yamanakaInoNaruto_v1" : {
+        "char" : "hair_over_one_eye, blonde_hair,",
+        #"negative" : "__no2d__",
+        "lora" : "yamanakaInoNaruto_v1"
+    },
+    "gwenFromLeagueOf_gwenLolV1" : {
+        "char" : "gwen \(league of legends\), drill hair,",
+        #"negative" : "__no2d__",
+        "lora" : "gwenFromLeagueOf_gwenLolV1"
+    },
+    "barbara2in1Lora_v10" : {
+        "char" : "{barbara \(genshin impact\)|barbara \(summertime sparkle\) \(genshin impact\)}, twintails, blonde hair,",
+        #"negative" : "__no2d__",
+        "lora" : "barbara2in1Lora_v10"
+    },
+    "ningguang_v10" : {
+        "char" : "__ningguang_head__,",
+        #"negative" : "__no2d__",
+        "lora" : "ningguang_v10"
+    },
+    "kamisatoAyakaGenshin_ayakav10" : {
+        "char" : "ayaka, genshin impact, kamisato ayaka, photorealistic,",
+        "negative" : "__no3d__",
+        "lora" : "kamisatoAyakaGenshin_ayakav10"
+    },
+    "primKuroinu_10" : {
+        "char" : "kuroinu_prim,",
+        #"negative" : "__no3d__",
+        "lora" : "primKuroinu_10"
+    },
+    "tsubeHanaTheHypnosis_tsubeHana" : {
+        "char" : "Tsube Hana, side braid, ",
+        #"negative" : "__no3d__",
+        "lora" : "tsubeHanaTheHypnosis_tsubeHana"
+    },
+    "Fashion Girl" : {
+        "char" : "fashi-girl, red lips, makeup, realistic,",
+        #"negative" : "__no3d__",
+        "lora" : ["fashionGirl_v50","fashionGirl_v47"]
+    },
+    #"liyuuLora_liyuuV1" : {
+    #    "char" : "black hair, bangs, ",
+    #    "negative" : "__no3d__",
+    #    "lora" : "liyuuLora_liyuuV1"
+    #},
+    "chineseCosplayerXiaorouseeu_v10" : {
+        "char" : "black hair, bangs, ",
+        "negative" : "__no3d__",
+        "lora" : "liyuuLora_liyuuV1"
+    },
+    "IrisPokemon_v10" : {
+        "char" : "irisa, irisb, irisc,",
+        #"negative" : "__no3d__",
+        "lora" : "IrisPokemon_v10"
+    },
+    "shalltearBloodfallen_v10" : {
+        "char" : "shalltear, shalltearcostume, ponytail, ",
+        #"negative" : "__no3d__",
+        "lora" : "shalltearBloodfallen_v10"
+    },
+    "blackarona_v10" : {
+        "char" : "arona, white hair, ",
+        #"negative" : "__no3d__",
+        "lora" : "blackarona_v10"
+    },
+    "gloriousAzurLaneSpring_GloriousSpiring" : {
+        "char" : "blonde hair,",
+        #"negative" : "__no3d__",
+        "lora" : "gloriousAzurLaneSpring_GloriousSpiring"
+    },
+    "kidmoStyle_v1" : {
+        #"char" : "blonde hair,",
+        #"negative" : "__no3d__",
+        "lora" : "kidmoStyle_v1"
+    },
+    "fuyusakaIori13SentinelsAegisRim_fuyusakaIoriSoftV10" : {
+        "char" : "fuyusaka iori, fuyusaka iori 1, long hair, grey hair,",
+        #"negative" : "__no3d__",
+        "lora" : "fuyusakaIori13SentinelsAegisRim_fuyusakaIoriSoftV10"
+    },
+    "9a91GirlsFrontline_v10" : {
+        "char" : "BREAK 9a91maid, ",
+        #"negative" : "__no3d__",
+        "lora" : "9a91GirlsFrontline_v10"
+    },
+    "BishojoMangekyoKotowariToMeikyuNoShojo_rengeV20" : {
+        "char" : "renge, ",
+        #"negative" : "__no3d__",
+        "lora" : "9a91GirlsFrontline_v10"
+    },
+    "Tsukihi" : {
+        "char" : "araragi tsukihi, black {short|long} hair, bangs, {green kimono,{short kimono,|}|}",
+        #"negative" : "__no3d__",
+        "lora" : "araragiTsukihiLora_v1"
+    },
+    "Ayesha" : {
+        "char" : "charayesha, ayesha altugle,",
+        #"negative" : "__no3d__",
+        "lora" : "atelierAyeshaAyeshaAltugle_v1"
+    },
+    "bannerOfTheMaidNicoletteOudinot_grenadierV10" : {
+        "char" : "grenadier,",
+        #"negative" : "__no3d__",
+        "lora" : "bannerOfTheMaidNicoletteOudinot_grenadierV10"
+    },
+    "Katsushika " : {
+        "char" : [
+        "katsushika hokusai \(fate\), kimono, obi, hair flower, sandals, tabi, hair stick, fur collar",
+        "katsushika hokusai \(fate\), kimono, hair flower, sandals, tabi, hair stick, off shoulder, yellow bow",
+        "katsushika hokusai \(fate\), hair ornament, black dress, pale skin, tentacles, red eyes",
+        "katsushika hokusai \(fate\), single hair bun, hooded jacket, shoulder bag, hairpin, skirt, shoes",
+        ],
+        #"negative" : "__no3d__",
+        "lora" : "katsushikaHokusaiFate_v2"
+    },
+    "my" : {
+        "positive" : "__my__",
+        #"negative" : "__no2d__",
+    },
+}
